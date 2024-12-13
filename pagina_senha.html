@@ -87,6 +87,21 @@
         .error {
             animation: shake 0.5s ease-in-out;
         }
+
+        #confirmButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        #confirmButton:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -104,6 +119,9 @@
     </div>
     <div class="celebration" style="display: none;">
         <p>Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!</p>
+    </div>
+    <div>
+        <button id="confirmButton">Confirmar Senha</button>
     </div>
 </div>
 
@@ -127,33 +145,39 @@
 
             // Salva a tentativa do usuário
             userCode[index] = currentDigit;
-
-            // Verifica se a senha está correta após a confirmação
-            if (userCode.toString() === lockCode.toString()) {
-                document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
-                let celebrationMessage = document.querySelector('.celebration');
-                celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
-
-                // Toca o som de sucesso
-                let successSound = document.getElementById('successSound');
-                successSound.play();
-
-                // Remove qualquer efeito de erro anterior
-                document.querySelector('.lock-image').classList.remove('error');
-            } else {
-                // Se a senha estiver errada, aplica o efeito de erro
-                document.querySelector('.lock-image').classList.add('error');
-
-                // Toca o som de erro
-                let errorSound = document.getElementById('errorSound');
-                errorSound.play();
-
-                // Faz o celular vibrar (caso o navegador permita)
-                if (navigator.vibrate) {
-                    navigator.vibrate([500, 200, 500]); // Vibração forte
-                }
-            }
         });
+    });
+
+    // Confirmação de senha
+    document.getElementById('confirmButton').addEventListener('click', () => {
+        if (userCode.toString() === lockCode.toString()) {
+            // Se a senha estiver correta
+            document.querySelector('.message').innerText = 'Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!';
+            let celebrationMessage = document.querySelector('.celebration');
+            celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
+
+            // Remove o cadeado
+            document.querySelector('.lock-image').style.display = 'none';
+
+            // Toca o som de sucesso
+            let successSound = document.getElementById('successSound');
+            successSound.play();
+
+            // Remove a animação de erro, se houver
+            document.querySelector('.lock-image').classList.remove('error');
+        } else {
+            // Se a senha estiver errada
+            document.querySelector('.lock-image').classList.add('error'); // Aplica a animação de erro
+
+            // Toca o som de erro
+            let errorSound = document.getElementById('errorSound');
+            errorSound.play();
+
+            // Faz o celular vibrar (caso o navegador permita)
+            if (navigator.vibrate) {
+                navigator.vibrate([1000, 500, 1000]); // Vibração forte
+            }
+        }
     });
 </script>
 
