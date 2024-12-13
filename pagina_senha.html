@@ -107,10 +107,6 @@
     </div>
 </div>
 
-<!-- Adicionando o efeito sonoro -->
-<audio id="successSound" src="sucesso.mp3" preload="auto"></audio>
-<audio id="errorSound" src="erro.mp3" preload="auto"></audio>
-
 <script>
     let dials = document.querySelectorAll('.dial');
     let lockCode = [5, 2, 2, 5]; // A senha será 5225
@@ -131,19 +127,11 @@
                 let celebrationMessage = document.querySelector('.celebration');
                 celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
 
-                // Toca o som de sucesso
-                let successSound = document.getElementById('successSound');
-                successSound.play();
-
                 // Remove qualquer efeito de erro anterior
                 document.querySelector('.lock-image').classList.remove('error');
             } else {
                 // Se a senha estiver errada, aplica o efeito de erro
                 document.querySelector('.lock-image').classList.add('error');
-
-                // Toca o som de erro
-                let errorSound = document.getElementById('errorSound');
-                errorSound.play();
 
                 // Ativa a vibração muito forte
                 if (navigator.vibrate) {
@@ -155,5 +143,4 @@
 </script>
 
 </body>
-</html> 
-            
+</html>                    
