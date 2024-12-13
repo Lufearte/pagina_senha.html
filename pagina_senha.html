@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadeado com Animações</title>
+    <title>Cadeado com Animações, Som e Erro</title>
     <style>
         body {
             display: flex;
@@ -26,6 +26,7 @@
             background-size: contain;
             background-repeat: no-repeat;
             margin-bottom: 20px;
+            transition: transform 0.2s;
         }
 
         .dial {
@@ -61,7 +62,6 @@
             }
         }
 
-        /* Animação de celebração ao abrir o cadeado */
         .celebration {
             font-size: 24px;
             color: green;
@@ -73,6 +73,19 @@
         @keyframes fadeInCelebration {
             0% { opacity: 0; }
             100% { opacity: 1; }
+        }
+
+        /* Animação de erro (vibração) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .error {
+            animation: shake 0.5s ease-in-out;
         }
     </style>
 </head>
@@ -94,6 +107,10 @@
     </div>
 </div>
 
+<!-- Adicionando o efeito sonoro -->
+<audio id="successSound" src="sucesso.mp3" preload="auto"></audio>
+<audio id="errorSound" src="erro.mp3" preload="auto"></audio>
+
 <script>
     let dials = document.querySelectorAll('.dial');
     let lockCode = [5, 2, 2, 5]; // A senha será 5225
@@ -113,10 +130,24 @@
                 document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
                 let celebrationMessage = document.querySelector('.celebration');
                 celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
+
+                // Toca o som de sucesso
+                let successSound = document.getElementById('successSound');
+                successSound.play();
+
+                // Remove qualquer efeito de erro anterior
+                document.querySelector('.lock-image').classList.remove('error');
+            } else {
+                // Se a senha estiver errada, aplica o efeito de erro
+                document.querySelector('.lock-image').classList.add('error');
+
+                // Toca o som de erro
+                let errorSound = document.getElementById('errorSound');
+                errorSound.play();
             }
         });
     });
 </script>
 
 </body>
-</html>         
+</html>
