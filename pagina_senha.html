@@ -50,13 +50,6 @@
             color: #333;
         }
 
-        .celebration {
-            font-size: 24px;
-            color: green;
-            font-weight: bold;
-            display: none;
-        }
-
         .confetti {
             position: absolute;
             top: 0;
@@ -135,11 +128,6 @@
 
     <!-- Botão de confirmação -->
     <button class="confirm-btn" onclick="confirmarSenha()">Confirmar Senha</button>
-
-    <!-- Mensagem de celebração -->
-    <div class="celebration">
-        <p>Parabéns! Você pode pegar a caixa vermelha!</p>
-    </div>
 </div>
 
 <script>
@@ -176,8 +164,6 @@
         // Verifica se a senha está correta
         if (userCode.toString() === lockCode.toString()) {
             document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
-            let celebrationMessage = document.querySelector('.celebration');
-            celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
 
             // Inicia animação de confetes
             animarConfetes();
