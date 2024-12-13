@@ -90,25 +90,53 @@
             font-size: 24px;
             margin-bottom: 20px;
             color: #333;
+            font-weight: bold;
+        }
+
+        .confirm-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .confirm-btn:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
 
 <div class="lock-container">
+    <!-- Mensagem de boas-vindas -->
     <div class="welcome">
         Olá Felipe, bem-vindo! Digite a senha para abrir o cadeado.
     </div>
-    <div class="lock-image"></div> <!-- Imagem do cadeado -->
+    
+    <!-- Imagem do cadeado -->
+    <div class="lock-image"></div>
+
+    <!-- Dials de senha -->
     <div>
         <div class="dial"><span>0</span></div>
         <div class="dial"><span>0</span></div>
         <div class="dial"><span>0</span></div>
         <div class="dial"><span>0</span></div>
     </div>
+
+    <!-- Mensagem de senha -->
     <div class="message">
         Digite a senha correta para abrir o cadeado!
     </div>
+
+    <!-- Botão de confirmação -->
+    <button class="confirm-btn" onclick="confirmarSenha()">Confirmar Senha</button>
+
+    <!-- Mensagem de celebração -->
     <div class="celebration">
         <p>Parabéns! Você pode pegar a caixa vermelha!</p>
     </div>
@@ -123,6 +151,12 @@
     function vibrar() {
         if (navigator.vibrate) {
             navigator.vibrate([1000, 100, 1000]); // Vibração forte
+        } else {
+            // Se não funcionar, aplica o efeito de shake na tela
+            document.body.style.animation = "shake 0.5s ease-in-out";
+            setTimeout(() => {
+                document.body.style.animation = ""; // Remove o efeito após a animação
+            }, 500);
         }
     }
 
@@ -137,6 +171,28 @@
         }, 3000); // Remove confetes após 3 segundos
     }
 
+    // Função para confirmar a senha
+    function confirmarSenha() {
+        // Verifica se a senha está correta
+        if (userCode.toString() === lockCode.toString()) {
+            document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
+            let celebrationMessage = document.querySelector('.celebration');
+            celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
+
+            // Inicia animação de confetes
+            animarConfetes();
+
+            // Remove qualquer efeito de erro anterior
+            document.querySelector('.lock-image').classList.remove('error');
+        } else {
+            // Se a senha estiver errada, aplica o efeito de erro
+            document.querySelector('.lock-image').classList.add('error');
+
+            // Vibra o celular ou balança a tela
+            vibrar();
+        }
+    }
+
     dials.forEach((dial, index) => {
         dial.addEventListener('click', () => {
             let currentDigit = parseInt(dial.innerText);
@@ -145,28 +201,9 @@
 
             // Salva a tentativa do usuário
             userCode[index] = currentDigit;
-
-            // Verifica se a senha está correta
-            if (userCode.toString() === lockCode.toString()) {
-                document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
-                let celebrationMessage = document.querySelector('.celebration');
-                celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
-
-                // Inicia animação de confetes
-                animarConfetes();
-
-                // Remove qualquer efeito de erro anterior
-                document.querySelector('.lock-image').classList.remove('error');
-            } else {
-                // Se a senha estiver errada, aplica o efeito de erro
-                document.querySelector('.lock-image').classList.add('error');
-
-                // Vibra o celular
-                vibrar();
-            }
         });
     });
 </script>
 
 </body>
-</html>            
+</html>
