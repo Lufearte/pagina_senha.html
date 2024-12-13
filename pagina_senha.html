@@ -86,6 +86,13 @@
             font-weight: bold;
         }
 
+        .success-message {
+            font-size: 24px;
+            color: green;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
         .confirm-btn {
             background-color: #4CAF50;
             color: white;
@@ -128,6 +135,11 @@
 
     <!-- Botão de confirmação -->
     <button class="confirm-btn" onclick="confirmarSenha()">Confirmar Senha</button>
+
+    <!-- Mensagem de sucesso -->
+    <div class="success-message" style="display: none;">
+        Parabéns, você pode pegar a caixa vermelha!
+    </div>
 </div>
 
 <script>
@@ -164,6 +176,7 @@
         // Verifica se a senha está correta
         if (userCode.toString() === lockCode.toString()) {
             document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
+            document.querySelector('.success-message').style.display = 'block'; // Exibe a mensagem de sucesso
 
             // Inicia animação de confetes
             animarConfetes();
