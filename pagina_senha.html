@@ -1,9 +1,9 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadeado com Números</title>
+    <title>Cadeado com Animações</title>
     <style>
         body {
             display: flex;
@@ -16,18 +16,32 @@
 
         .lock {
             display: flex;
+            flex-direction: column;
             align-items: center;
             background: #333;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .lock-body {
+            width: 120px;
+            height: 100px;
+            background-color: #555;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 10px;
+            position: relative;
+            z-index: 2;
         }
 
         .dial {
             width: 40px;
             height: 60px;
-            background-color: #555;
-            margin: 0 10px;
+            background-color: #777;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -38,21 +52,78 @@
             cursor: pointer;
         }
 
+        .lock-arch {
+            width: 60px;
+            height: 80px;
+            background-color: #444;
+            border-radius: 60px 60px 0 0;
+            position: absolute;
+            top: -40px;
+            z-index: 1;
+        }
+
         .message {
             margin-top: 20px;
             text-align: center;
             font-size: 20px;
             color: #333;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
         }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 3;
+            display: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: gold;
+            border-radius: 50%;
+            animation: particleAnimation 1s ease-out infinite;
+        }
+
+        @keyframes particleAnimation {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y));
+                opacity: 0;
+            }
+        }
+
     </style>
 </head>
 <body>
 
 <div class="lock">
-    <div class="dial"><span>0</span></div>
-    <div class="dial"><span>0</span></div>
-    <div class="dial"><span>0</span></div>
-    <div class="dial"><span>0</span></div>
+    <div class="lock-arch"></div>
+    <div class="lock-body">
+        <div class="dial"><span>0</span></div>
+        <div class="dial"><span>0</span></div>
+        <div class="dial"><span>0</span></div>
+        <div class="dial"><span>0</span></div>
+    </div>
+    <div class="particles"></div>
 </div>
 
 <div class="message">
@@ -63,6 +134,7 @@
     let dials = document.querySelectorAll('.dial');
     let lockCode = [5, 2, 2, 5]; // A senha será 5225
     let userCode = [];
+    let particles = document.querySelector('.particles');
 
     dials.forEach((dial, index) => {
         dial.addEventListener('click', () => {
@@ -75,11 +147,34 @@
 
             // Verifica se a senha está correta
             if (userCode.length === lockCode.length && userCode.toString() === lockCode.toString()) {
-                document.querySelector('.message').innerText = 'Parabéns! Você conseguiu abrir a caixa vermelha!';
+                // Efeito de animação de abertura do cadeado
+                document.querySelector('.lock').style.transform = 'scale(1.2)';
+                document.querySelector('.message').innerText = 'Parabéns! Você abriu o cadeado!';
+                
+                // Ativar partículas
+                particles.style.display = 'block';
+                createParticles();
             }
         });
     });
+
+    // Função para criar partículas
+    function createParticles() {
+        for (let i = 0; i < 100; i++) {
+            let particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.setProperty('--x', `${(Math.random() - 0.5) * 300}px`);
+            particle.style.setProperty('--y', `${(Math.random() - 0.5) * 300}px`);
+            particles.appendChild(particle);
+        }
+
+        setTimeout(() => {
+            particles.style.display = 'none';
+        }, 1500);  // Esconde partículas após 1.5 segundos
+    }
 </script>
 
 </body>
-</html>
+</html>         
