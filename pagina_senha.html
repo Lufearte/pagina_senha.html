@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadeado com Animações, Som e Erro</title>
+    <title>Cadeado com Senha, Animações e Vibração</title>
     <style>
         body {
             display: flex;
@@ -12,10 +12,10 @@
             height: 100vh;
             margin: 0;
             background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
         }
 
         .lock-container {
-            position: relative;
             text-align: center;
         }
 
@@ -46,36 +46,34 @@
 
         .message {
             margin-top: 20px;
-            text-align: center;
             font-size: 20px;
             color: #333;
-            opacity: 0;
-            animation: fadeIn 1s forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
         }
 
         .celebration {
             font-size: 24px;
             color: green;
             font-weight: bold;
-            opacity: 0;
-            animation: fadeInCelebration 2s forwards;
+            display: none;
         }
 
-        @keyframes fadeInCelebration {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
+        .confetti {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://cdn.pixabay.com/photo/2017/12/18/20/59/celebration-3020766_960_720.png') repeat;
+            background-size: 50px 50px;
+            animation: confetti 3s ease-out;
+            pointer-events: none;
         }
 
-        /* Animação de erro (vibração) */
+        @keyframes confetti {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
         @keyframes shake {
             0% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
@@ -87,11 +85,20 @@
         .error {
             animation: shake 0.5s ease-in-out;
         }
+
+        .welcome {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
 
 <div class="lock-container">
+    <div class="welcome">
+        Olá Felipe, bem-vindo! Digite a senha para abrir o cadeado.
+    </div>
     <div class="lock-image"></div> <!-- Imagem do cadeado -->
     <div>
         <div class="dial"><span>0</span></div>
@@ -100,17 +107,35 @@
         <div class="dial"><span>0</span></div>
     </div>
     <div class="message">
-        <p>Digite a senha correta para abrir o cadeado!</p>
+        Digite a senha correta para abrir o cadeado!
     </div>
-    <div class="celebration" style="display: none;">
-        <p>Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!</p>
+    <div class="celebration">
+        <p>Parabéns! Você pode pegar a caixa vermelha!</p>
     </div>
 </div>
 
 <script>
     let dials = document.querySelectorAll('.dial');
-    let lockCode = [5, 2, 2, 5]; // A senha será 5225
+    let lockCode = [5, 2, 2, 5]; // Senha correta: 5225
     let userCode = [];
+
+    // Função para criar a vibração
+    function vibrar() {
+        if (navigator.vibrate) {
+            navigator.vibrate([1000, 100, 1000]); // Vibração forte
+        }
+    }
+
+    // Função para iniciar animação de confetes
+    function animarConfetes() {
+        let confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        document.body.appendChild(confetti);
+
+        setTimeout(() => {
+            confetti.remove();
+        }, 3000); // Remove confetes após 3 segundos
+    }
 
     dials.forEach((dial, index) => {
         dial.addEventListener('click', () => {
@@ -127,20 +152,21 @@
                 let celebrationMessage = document.querySelector('.celebration');
                 celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
 
+                // Inicia animação de confetes
+                animarConfetes();
+
                 // Remove qualquer efeito de erro anterior
                 document.querySelector('.lock-image').classList.remove('error');
             } else {
                 // Se a senha estiver errada, aplica o efeito de erro
                 document.querySelector('.lock-image').classList.add('error');
 
-                // Ativa a vibração muito forte
-                if (navigator.vibrate) {
-                    navigator.vibrate([1000, 100, 1000]); // Vibração muito forte
-                }
+                // Vibra o celular
+                vibrar();
             }
         });
     });
 </script>
 
 </body>
-</html>                    
+</html>            
