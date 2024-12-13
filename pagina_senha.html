@@ -1,89 +1,84 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protegido por Senha</title>
+    <title>Cadeado com Números</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f7f7f7;
+            background-color: #f2f2f2;
         }
-        .login-container {
-            text-align: center;
+
+        .lock {
+            display: flex;
+            align-items: center;
+            background: #333;
             padding: 20px;
-            border: 2px solid #ccc;
             border-radius: 10px;
-            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
-        .login-container input {
-            padding: 10px;
-            margin: 10px 0;
-            width: 200px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .login-container button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
+
+        .dial {
+            width: 40px;
+            height: 60px;
+            background-color: #555;
+            margin: 0 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            font-weight: bold;
             color: white;
-            border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        .login-container button:hover {
-            background-color: #45a049;
-        }
-        .login-container p {
-            color: red;
-            display: none;
-            margin-top: 10px;
-        }
-        .error-message {
-            animation: shake 0.5s ease-in-out 0s 1;
-        }
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
+
+        .message {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 20px;
+            color: #333;
         }
     </style>
 </head>
 <body>
 
-<div class="login-container">
-    <h2>Digite a senha para acessar</h2>
-    <input type="password" id="password" placeholder="Senha">
-    <button onclick="checkPassword()">Entrar</button>
-    <p id="error-message" class="error-message">Senha incorreta! Tente novamente.</p>
-    <p id="success-message" style="color: green; display: none;">Parabéns, você conseguiu, pode abrir a caixa vermelha!</p>
+<div class="lock">
+    <div class="dial"><span>0</span></div>
+    <div class="dial"><span>0</span></div>
+    <div class="dial"><span>0</span></div>
+    <div class="dial"><span>0</span></div>
+</div>
+
+<div class="message">
+    <p>Digite a senha correta para abrir o cadeado!</p>
 </div>
 
 <script>
-    const correctPassword = "5225";
+    let dials = document.querySelectorAll('.dial');
+    let lockCode = [5, 2, 2, 5]; // A senha será 5225
+    let userCode = [];
 
-    function checkPassword() {
-        const enteredPassword = document.getElementById('password').value;
-        const errorMessage = document.getElementById('error-message');
-        const successMessage = document.getElementById('success-message');
-        
-        if (enteredPassword === correctPassword) {
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'block';
-            // Aqui você pode redirecionar ou abrir algo, se desejar.
-        } else {
-            successMessage.style.display = 'none';
-            errorMessage.style.display = 'block';
-            errorMessage.classList.add('error-message');
-        }
-    }
+    dials.forEach((dial, index) => {
+        dial.addEventListener('click', () => {
+            let currentDigit = parseInt(dial.innerText);
+            currentDigit = (currentDigit + 1) % 10;  // Incrementa o número, vai de 0 a 9
+            dial.innerText = currentDigit;
+
+            // Salva a tentativa do usuário
+            userCode[index] = currentDigit;
+
+            // Verifica se a senha está correta
+            if (userCode.length === lockCode.length && userCode.toString() === lockCode.toString()) {
+                document.querySelector('.message').innerText = 'Parabéns! Você conseguiu abrir a caixa vermelha!';
+            }
+        });
+    });
 </script>
 
 </body>
