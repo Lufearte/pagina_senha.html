@@ -1,4 +1,117 @@
- <script>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadeado com Animações, Som e Erro</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2;
+        }
+
+        .lock-container {
+            position: relative;
+            text-align: center;
+        }
+
+        .lock-image {
+            width: 200px;
+            height: 300px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Lock_icon_2.svg/1024px-Lock_icon_2.svg.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .dial {
+            width: 40px;
+            height: 60px;
+            background-color: #777;
+            display: inline-block;
+            margin: 0 5px;
+            text-align: center;
+            line-height: 60px;
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 20px;
+            color: #333;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .celebration {
+            font-size: 24px;
+            color: green;
+            font-weight: bold;
+            opacity: 0;
+            animation: fadeInCelebration 2s forwards;
+        }
+
+        @keyframes fadeInCelebration {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Animação de erro (vibração) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .error {
+            animation: shake 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+<div class="lock-container">
+    <div class="lock-image"></div> <!-- Imagem do cadeado -->
+    <div>
+        <div class="dial"><span>0</span></div>
+        <div class="dial"><span>0</span></div>
+        <div class="dial"><span>0</span></div>
+        <div class="dial"><span>0</span></div>
+    </div>
+    <div class="message">
+        <p>Digite a senha correta para abrir o cadeado!</p>
+    </div>
+    <div class="celebration" style="display: none;">
+        <p>Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!</p>
+    </div>
+</div>
+
+<!-- Adicionando o efeito sonoro -->
+<audio id="successSound" src="sucesso.mp3" preload="auto"></audio>
+<audio id="errorSound" src="erro.mp3" preload="auto"></audio>
+
+<script>
     let dials = document.querySelectorAll('.dial');
     let lockCode = [5, 2, 2, 5]; // A senha será 5225
     let userCode = [];
@@ -39,4 +152,8 @@
             }
         });
     });
- </script>   
+</script>
+
+</body>
+</html> 
+            
