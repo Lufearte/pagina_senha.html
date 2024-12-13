@@ -14,52 +14,33 @@
             background-color: #f2f2f2;
         }
 
-        .lock {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #333;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        .lock-container {
             position: relative;
-            transition: transform 0.5s ease-in-out;
+            text-align: center;
         }
 
-        .lock-body {
-            width: 120px;
-            height: 100px;
-            background-color: #555;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-radius: 10px;
-            position: relative;
-            z-index: 2;
+        .lock-image {
+            width: 200px;
+            height: 300px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Lock_icon_2.svg/1024px-Lock_icon_2.svg.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-bottom: 20px;
         }
 
         .dial {
             width: 40px;
             height: 60px;
             background-color: #777;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: inline-block;
+            margin: 0 5px;
+            text-align: center;
+            line-height: 60px;
             font-size: 30px;
             font-weight: bold;
             color: white;
             border-radius: 5px;
             cursor: pointer;
-        }
-
-        .lock-arch {
-            width: 60px;
-            height: 80px;
-            background-color: #444;
-            border-radius: 60px 60px 0 0;
-            position: absolute;
-            top: -40px;
-            z-index: 1;
         }
 
         .message {
@@ -80,61 +61,43 @@
             }
         }
 
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            z-index: 3;
-            display: none;
+        /* Animação de celebração ao abrir o cadeado */
+        .celebration {
+            font-size: 24px;
+            color: green;
+            font-weight: bold;
+            opacity: 0;
+            animation: fadeInCelebration 2s forwards;
         }
 
-        .particle {
-            position: absolute;
-            width: 5px;
-            height: 5px;
-            background-color: gold;
-            border-radius: 50%;
-            animation: particleAnimation 1s ease-out infinite;
+        @keyframes fadeInCelebration {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
         }
-
-        @keyframes particleAnimation {
-            0% {
-                transform: translate(0, 0);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--x), var(--y));
-                opacity: 0;
-            }
-        }
-
     </style>
 </head>
 <body>
 
-<div class="lock">
-    <div class="lock-arch"></div>
-    <div class="lock-body">
+<div class="lock-container">
+    <div class="lock-image"></div> <!-- Imagem do cadeado -->
+    <div>
         <div class="dial"><span>0</span></div>
         <div class="dial"><span>0</span></div>
         <div class="dial"><span>0</span></div>
         <div class="dial"><span>0</span></div>
     </div>
-    <div class="particles"></div>
-</div>
-
-<div class="message">
-    <p>Digite a senha correta para abrir o cadeado!</p>
+    <div class="message">
+        <p>Digite a senha correta para abrir o cadeado!</p>
+    </div>
+    <div class="celebration" style="display: none;">
+        <p>Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!</p>
+    </div>
 </div>
 
 <script>
     let dials = document.querySelectorAll('.dial');
     let lockCode = [5, 2, 2, 5]; // A senha será 5225
     let userCode = [];
-    let particles = document.querySelector('.particles');
 
     dials.forEach((dial, index) => {
         dial.addEventListener('click', () => {
@@ -146,34 +109,13 @@
             userCode[index] = currentDigit;
 
             // Verifica se a senha está correta
-            if (userCode.length === lockCode.length && userCode.toString() === lockCode.toString()) {
-                // Efeito de animação de abertura do cadeado
-                document.querySelector('.lock').style.transform = 'scale(1.2)';
-                document.querySelector('.message').innerText = 'Parabéns! Você abriu o cadeado!';
-                
-                // Ativar partículas
-                particles.style.display = 'block';
-                createParticles();
+            if (userCode.toString() === lockCode.toString()) {
+                document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
+                let celebrationMessage = document.querySelector('.celebration');
+                celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
             }
         });
     });
-
-    // Função para criar partículas
-    function createParticles() {
-        for (let i = 0; i < 100; i++) {
-            let particle = document.createElement('div');
-            particle.classList.add('particle');
-            particle.style.left = `${Math.random() * 100}%`;
-            particle.style.top = `${Math.random() * 100}%`;
-            particle.style.setProperty('--x', `${(Math.random() - 0.5) * 300}px`);
-            particle.style.setProperty('--y', `${(Math.random() - 0.5) * 300}px`);
-            particles.appendChild(particle);
-        }
-
-        setTimeout(() => {
-            particles.style.display = 'none';
-        }, 1500);  // Esconde partículas após 1.5 segundos
-    }
 </script>
 
 </body>
