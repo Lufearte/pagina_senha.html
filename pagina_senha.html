@@ -7,153 +7,132 @@
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #f2f2f2;
             font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
             text-align: center;
-            flex-direction: column;
+        }
+
+        .welcome {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .lock-image {
+            width: 150px;
+            height: auto;
+            margin-bottom: 30px;
+            transition: transform 0.3s;
+        }
+
+        .numbers-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .number {
+            width: 40px;
+            height: 50px;
+            background-color: #ddd;
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 50px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .confirm-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .confirm-btn:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
         }
 
         .message {
             font-size: 24px;
-            color: #333;
-            margin-top: 20px;
+            color: green;
+            font-weight: bold;
+            display: none;
         }
 
-        .lock-container {
-            position: relative;
-            text-align: center;
-        }
-
-        .lock-image {
-            width: 200px;
-            height: 300px;
-            background-image: url('https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            margin-bottom: 20px;
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .input-container {
-            margin: 20px;
-        }
-
-        .input-container input {
-            width: 50px;
-            height: 50px;
-            font-size: 30px;
-            text-align: center;
-            margin: 5px;
-            border-radius: 5px;
-            border: 2px solid #ccc;
-        }
-
-        .error {
-            animation: shake 0.5s ease-in-out;
-        }
-
-        /* Animação de erro (vibração) */
         @keyframes shake {
-            0% { transform: translateX(0); }
+            0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
             50% { transform: translateX(10px); }
             75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
         }
 
-        .celebration {
-            font-size: 24px;
-            color: green;
-            font-weight: bold;
-            opacity: 0;
-            animation: fadeInCelebration 2s forwards;
-        }
-
-        @keyframes fadeInCelebration {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        .confirm-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            font-size: 18px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .confirm-button:hover {
-            background-color: #45a049;
+        .error {
+            animation: shake 0.5s;
         }
     </style>
 </head>
 <body>
-
-    <div class="message" id="welcome-message">
-        Olá, Felipe! Digite a senha:
+    <div class="welcome">Olá Felipe, digite a senha</div>
+    <img id="lock" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado Fechado">
+    <div class="numbers-container">
+        <div class="number">0</div>
+        <div class="number">0</div>
+        <div class="number">0</div>
+        <div class="number">0</div>
     </div>
-
-    <div class="lock-container">
-        <div class="lock-image" id="lock-image"></div>
-        <div class="input-container">
-            <input type="number" id="input1" maxlength="1">
-            <input type="number" id="input2" maxlength="1">
-            <input type="number" id="input3" maxlength="1">
-            <input type="number" id="input4" maxlength="1">
-        </div>
-        <button class="confirm-button" id="confirm-button">Confirmar Senha</button>
-        <div class="celebration" id="celebration-message"></div>
-    </div>
-
-    <audio id="error-sound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
-    <audio id="success-sound" src="https://www.soundjay.com/button/beep-08b.wav" preload="auto"></audio>
+    <button class="confirm-btn" id="confirmBtn" disabled>Confirmar Senha</button>
+    <div class="message" id="successMessage">Parabéns! Você conseguiu abrir o cadeado! Pegue o prêmio!</div>
 
     <script>
-        const correctPassword = "2552";  // Senha correta
-        let currentInput = ["", "", "", ""]; // Armazenando os valores dos campos
+        const lock = document.getElementById("lock");
+        const numbers = document.querySelectorAll(".number");
+        const confirmBtn = document.getElementById("confirmBtn");
+        const successMessage = document.getElementById("successMessage");
 
-        const inputs = document.querySelectorAll('input');
-        const confirmButton = document.getElementById('confirm-button');
-        const lockImage = document.getElementById('lock-image');
-        const welcomeMessage = document.getElementById('welcome-message');
-        const celebrationMessage = document.getElementById('celebration-message');
-        const errorSound = document.getElementById('error-sound');
-        const successSound = document.getElementById('success-sound');
+        const correctPassword = [2, 5, 5, 2];
+        let enteredPassword = [];
 
-        // Adicionando evento de input
-        inputs.forEach((input, index) => {
-            input.addEventListener('input', () => {
-                currentInput[index] = input.value;  // Armazenando valor digitado no campo
+        // Atualiza os números clicados
+        numbers.forEach((number, index) => {
+            number.addEventListener("click", () => {
+                let currentNumber = parseInt(number.textContent);
+                currentNumber = (currentNumber + 1) % 10;
+                number.textContent = currentNumber;
+                enteredPassword[index] = currentNumber;
+
+                if (enteredPassword.length === 4) {
+                    confirmBtn.disabled = false;
+                }
             });
         });
 
-        // Função para validar a senha
-        confirmButton.addEventListener('click', () => {
-            if (currentInput.join('') === correctPassword) {
-                // Se a senha estiver correta, mudar a imagem e mostrar a mensagem de sucesso
-                lockImage.style.display = 'none'; // Cadeado some
-                celebrationMessage.innerText = "Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!";
-                celebrationMessage.style.opacity = 1;
-                successSound.play();
+        // Confirma a senha ao clicar
+        confirmBtn.addEventListener("click", () => {
+            if (enteredPassword.toString() === correctPassword.toString()) {
+                lock.style.display = "none"; // Cadeado some
+                successMessage.style.display = "block"; // Mostra mensagem de sucesso
             } else {
-                // Se a senha estiver errada, aplicar animação de erro e tocar som
-                lockImage.classList.add('error');
-                errorSound.play();
-
-                // Remover a animação após ela ter terminado
-                setTimeout(() => {
-                    lockImage.classList.remove('error');
-                }, 500);
+                lock.classList.add("error"); // Animação de erro
+                navigator.vibrate(500); // Vibração no celular
+                setTimeout(() => lock.classList.remove("error"), 500);
             }
         });
     </script>
-
 </body>
 </html>
