@@ -28,44 +28,35 @@
             width: 150px;
             height: auto;
             margin-bottom: 30px;
-            transition: transform 1s ease-in-out; /* Efeito de rotação suave */
+            transition: transform 0.2s ease-in-out;
         }
 
-        .password-input {
+        .number-container {
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
         }
 
-        .password-input div {
-            width: 40px;
-            height: 40px;
-            margin: 0 5px;
-            text-align: center;
-            font-size: 24px;
+        .number {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            margin: 0 10px;
+        }
+
+        .number button {
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            background-color: #f0f0f0;
             border: 1px solid #ccc;
-        }
-
-        .button-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .button-container button {
-            font-size: 24px;
-            padding: 10px;
+            border-radius: 5px;
             cursor: pointer;
-            background-color: #e0e0e0;
-            border: 1px solid #ccc;
         }
 
-        .button-container button:hover {
-            background-color: #ccc;
+        .number span {
+            font-size: 24px;
+            margin: 10px 0;
         }
 
         .message {
@@ -101,101 +92,96 @@
         .error {
             animation: shake 0.5s ease-in-out;
         }
-
-        /* Animação de rotação */
-        @keyframes rotateLock {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .rotate {
-            animation: rotateLock 1s ease-in-out forwards;
-        }
     </style>
 </head>
 <body>
 
-<h1>Olá Felipe, clique nos números para digitar a senha</h1>
+<h1>Olá Felipe, digite a senha</h1>
 <div class="lock-container">
     <img id="lockImage" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado">
-    <div class="password-input">
-        <div id="digit1"></div>
-        <div id="digit2"></div>
-        <div id="digit3"></div>
-        <div id="digit4"></div>
-    </div>
-    <div class="button-container">
-        <button onclick="setDigit(1)">1</button>
-        <button onclick="setDigit(2)">2</button>
-        <button onclick="setDigit(3)">3</button>
-        <button onclick="setDigit(4)">4</button>
-        <button onclick="setDigit(5)">5</button>
-        <button onclick="setDigit(6)">6</button>
-        <button onclick="setDigit(7)">7</button>
-        <button onclick="setDigit(8)">8</button>
-        <button onclick="setDigit(9)">9</button>
-        <button onclick="setDigit(0)">0</button>
+    <div class="number-container">
+        <!-- Rodas para girar os números -->
+        <div class="number">
+            <button onclick="rotateNumber(0, 'up')">↑</button>
+            <span id="digit1">0</span>
+            <button onclick="rotateNumber(0, 'down')">↓</button>
+        </div>
+        <div class="number">
+            <button onclick="rotateNumber(1, 'up')">↑</button>
+            <span id="digit2">0</span>
+            <button onclick="rotateNumber(1, 'down')">↓</button>
+        </div>
+        <div class="number">
+            <button onclick="rotateNumber(2, 'up')">↑</button>
+            <span id="digit3">0</span>
+            <button onclick="rotateNumber(2, 'down')">↓</button>
+        </div>
+        <div class="number">
+            <button onclick="rotateNumber(3, 'up')">↑</button>
+            <span id="digit4">0</span>
+            <button onclick="rotateNumber(3, 'down')">↓</button>
+        </div>
     </div>
     <button id="confirmButton">Confirmar Senha</button>
     <div id="message" class="message"></div>
 </div>
 
-<audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio> <!-- Link do som -->
+<audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio>
 
 <script>
     const correctPassword = [5, 2, 2, 5]; // Senha correta: 5225
     const lockImage = document.getElementById('lockImage');
     const messageDiv = document.getElementById('message');
     const confirmButton = document.getElementById('confirmButton');
-    const digits = [document.getElementById('digit1'), document.getElementById('digit2'), document.getElementById('digit3'), document.getElementById('digit4')];
     const victorySound = document.getElementById('victorySound'); // Som de vitória
 
-    let enteredPassword = [];
+    let userPassword = [0, 0, 0, 0]; // Senha inicial (todas as posições começam com 0)
 
-    function setDigit(digit) {
-        // Encontra o primeiro campo vazio e adiciona o número
-        for (let i = 0; i < digits.length; i++) {
-            if (digits[i].textContent === "") {
-                digits[i].textContent = digit;
-                enteredPassword.push(digit);
-                break;
-            }
+    function rotateNumber(index, direction) {
+        if (direction === 'up') {
+            userPassword[index] = (userPassword[index] + 1) % 10; // Incrementa e volta para 0 após 9
+        } else {
+            userPassword[index] = (userPassword[index] - 1 + 10) % 10; // Decrementa e vai para 9 antes de 0
         }
+
+        // Atualiza a tela com o novo número
+        document.getElementById(`digit${index + 1}`).textContent = userPassword[index];
     }
 
     confirmButton.addEventListener('click', () => {
-        if (enteredPassword.length === 4) {
-            const userPassword = enteredPassword;
+        if (JSON.stringify(userPassword) === JSON.stringify(correctPassword)) {
+            // Senha correta
+            lockImage.style.display = 'none';
+            messageDiv.textContent = 'Parabéns! Você conseguiu, pode abrir a caixa vermelha!';
+            messageDiv.classList.add('success-message');
+            victorySound.play(); // Reproduz o som de vitória
+        } else {
+            // Senha incorreta
+            messageDiv.textContent = 'Senha incorreta. Tente novamente!';
+            messageDiv.classList.add('error-message');
+            lockImage.classList.add('error');
 
-            if (JSON.stringify(userPassword) === JSON.stringify(correctPassword)) {
-                // Senha correta
-                lockImage.style.display = 'none';
-                messageDiv.textContent = 'Parabéns! Você conseguiu, pode abrir a caixa vermelha!';
-                messageDiv.classList.add('success-message');
-                victorySound.play(); // Reproduz o som de vitória
-                lockImage.classList.add('rotate'); // Adiciona o efeito de rotação
-            } else {
-                // Senha incorreta
-                messageDiv.textContent = 'Senha incorreta. Tente novamente!';
-                messageDiv.classList.add('error-message');
-                lockImage.classList.add('error');
-
-                // Vibração do celular
-                if (navigator.vibrate) {
-                    navigator.vibrate([200, 100, 200]); // Vibração forte
-                }
-
-                // Remove a classe de erro após a animação
-                setTimeout(() => {
-                    lockImage.classList.remove('error');
-                }, 500);
+            // Vibração do celular
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]); // Vibração forte
             }
+
+            // Remove a classe de erro após a animação
+            setTimeout(() => {
+                lockImage.classList.remove('error');
+            }, 500);
+
+            // Reseta a senha
+            userPassword = [0, 0, 0, 0];
+            resetPasswordDisplay();
         }
     });
+
+    function resetPasswordDisplay() {
+        userPassword.forEach((num, index) => {
+            document.getElementById(`digit${index + 1}`).textContent = num;
+        });
+    }
 </script>
 
 </body>
