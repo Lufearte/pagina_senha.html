@@ -12,124 +12,127 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            background-color: #f2f2f2;
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            text-align: center;
         }
 
-        .welcome {
+        h1 {
             margin-bottom: 30px;
-            font-size: 24px;
-            font-weight: bold;
+        }
+
+        .lock-container {
+            text-align: center;
         }
 
         .lock-image {
             width: 150px;
             height: auto;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
+            margin-bottom: 30px;
+            transition: transform 0.2s ease-in-out;
         }
 
-        .numbers-container {
+        .password-input {
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
         }
 
-        .number {
+        .password-input input {
             width: 40px;
-            height: 50px;
-            background-color: #ddd;
-            color: #333;
-            font-size: 20px;
-            font-weight: bold;
+            height: 40px;
             text-align: center;
-            line-height: 50px;
+            font-size: 24px;
             margin: 0 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .confirm-btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .confirm-btn:disabled {
-            background-color: #aaa;
-            cursor: not-allowed;
         }
 
         .message {
-            font-size: 24px;
-            color: green;
+            margin-top: 20px;
+            font-size: 18px;
             font-weight: bold;
-            display: none;
         }
 
+        .success-message {
+            color: green;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        /* Animação de vibração */
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-15px); }
-            50% { transform: translateX(15px); }
-            75% { transform: translateX(-15px); }
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-10px);
+            }
+            50% {
+                transform: translateX(10px);
+            }
+            75% {
+                transform: translateX(-10px);
+            }
         }
 
         .error {
-            animation: shake 0.5s;
+            animation: shake 0.5s ease-in-out;
         }
     </style>
 </head>
 <body>
-    <div class="welcome">Olá Felipe, digite a senha</div>
-    <img id="lock" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado Fechado">
-    <div class="numbers-container">
-        <div class="number">0</div>
-        <div class="number">0</div>
-        <div class="number">0</div>
-        <div class="number">0</div>
+
+<h1>Olá Felipe, digite a senha</h1>
+<div class="lock-container">
+    <img id="lockImage" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado">
+    <div class="password-input">
+        <input type="text" maxlength="1" id="digit1">
+        <input type="text" maxlength="1" id="digit2">
+        <input type="text" maxlength="1" id="digit3">
+        <input type="text" maxlength="1" id="digit4">
     </div>
-    <button class="confirm-btn" id="confirmBtn" disabled>Confirmar Senha</button>
-    <div class="message" id="successMessage">Parabéns! Você conseguiu, pode abrir a caixa vermelha!</div>
+    <button id="confirmButton">Confirmar Senha</button>
+    <div id="message" class="message"></div>
+</div>
 
-    <script>
-        const lock = document.getElementById("lock");
-        const numbers = document.querySelectorAll(".number");
-        const confirmBtn = document.getElementById("confirmBtn");
-        const successMessage = document.getElementById("successMessage");
+<audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio> <!-- Link do som -->
+<!-- Substitua o link acima pelo link do YouTube convertido para mp3 -->
 
-        const correctPassword = [5, 2, 2, 5];
-        let enteredPassword = [0, 0, 0, 0];
+<script>
+    const correctPassword = [5, 2, 2, 5]; // Senha correta: 5225
+    const lockImage = document.getElementById('lockImage');
+    const messageDiv = document.getElementById('message');
+    const confirmButton = document.getElementById('confirmButton');
+    const inputs = Array.from(document.querySelectorAll('.password-input input'));
+    const victorySound = document.getElementById('victorySound'); // Som de vitória
 
-        // Atualiza os números clicados
-        numbers.forEach((number, index) => {
-            number.addEventListener("click", () => {
-                let currentNumber = parseInt(number.textContent);
-                currentNumber = (currentNumber + 1) % 10; // Vai de 0 a 9
-                number.textContent = currentNumber;
-                enteredPassword[index] = currentNumber;
+    confirmButton.addEventListener('click', () => {
+        const userPassword = inputs.map(input => parseInt(input.value, 10));
 
-                confirmBtn.disabled = enteredPassword.some(num => num === undefined); // Habilita botão quando todos preenchidos
-            });
-        });
+        if (JSON.stringify(userPassword) === JSON.stringify(correctPassword)) {
+            // Senha correta
+            lockImage.style.display = 'none';
+            messageDiv.textContent = 'Parabéns! Você conseguiu, pode abrir a caixa vermelha!';
+            messageDiv.classList.add('success-message');
+            victorySound.play(); // Reproduz o som de vitória
+        } else {
+            // Senha incorreta
+            messageDiv.textContent = 'Senha incorreta. Tente novamente!';
+            messageDiv.classList.add('error-message');
+            lockImage.classList.add('error');
 
-        // Confirma a senha ao clicar
-        confirmBtn.addEventListener("click", () => {
-            if (JSON.stringify(enteredPassword) === JSON.stringify(correctPassword)) {
-                lock.style.display = "none"; // Cadeado desaparece
-                successMessage.style.display = "block"; // Mostra mensagem de sucesso
-            } else {
-                lock.classList.add("error"); // Animação de erro
-                navigator.vibrate(1000); // Vibração de 1 segundo
-                setTimeout(() => lock.classList.remove("error"), 500);
+            // Vibração do celular
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]); // Vibração forte
             }
-        });
-    </script>
+
+            // Remove a classe de erro após a animação
+            setTimeout(() => {
+                lockImage.classList.remove('error');
+            }, 500);
+        }
+    });
+</script>
+
 </body>
-</html>        
+</html>
