@@ -1,188 +1,56 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadeado com Senha</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f2f2f2;
-            font-family: Arial, sans-serif;
+using UnityEngine;
+
+public class GarraControl : MonoBehaviour
+{
+    public float velocidade = 5f;  // Velocidade da garra
+    public float alcance = 3f;    // Distância que a garra pode alcançar
+    private bool pegando = false; // Se a garra está pegando o ursinho
+
+    void Update()
+    {
+        // Movimento horizontal (esquerda e direita)
+        float movimentoHorizontal = Input.GetAxis("Horizontal") * velocidade * Time.deltaTime;
+        transform.Translate(movimentoHorizontal, 0, 0);
+
+        // Movimento vertical (para frente e para trás)
+        float movimentoVertical = Input.GetAxis("Vertical") * velocidade * Time.deltaTime;
+        transform.Translate(0, 0, movimentoVertical);
+
+        // Tentar pegar o ursinho
+        if (Input.GetKeyDown(KeyCode.Space) && !pegando)
+        {
+            PegandoUrsinho();
         }
-
-        h1 {
-            margin-bottom: 30px;
-        }
-
-        .lock-container {
-            text-align: center;
-        }
-
-        .lock-image {
-            width: 150px;
-            height: auto;
-            margin-bottom: 30px;
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .number-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .number {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0 10px;
-        }
-
-        .number button {
-            width: 30px;
-            height: 30px;
-            font-size: 20px;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .number span {
-            font-size: 24px;
-            margin: 10px 0;
-        }
-
-        .message {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .success-message {
-            color: green;
-        }
-
-        .error-message {
-            color: red;
-        }
-
-        /* Animação de vibração */
-        @keyframes shake {
-            0%, 100% {
-                transform: translateX(0);
-            }
-            25% {
-                transform: translateX(-10px);
-            }
-            50% {
-                transform: translateX(10px);
-            }
-            75% {
-                transform: translateX(-10px);
-            }
-        }
-
-        .error {
-            animation: shake 0.5s ease-in-out;
-        }
-    </style>
-</head>
-<body>
-
-<h1>Olá Felipe, digite a senha</h1>
-<div class="lock-container">
-    <img id="lockImage" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado">
-    <div class="number-container">
-        <!-- Rodas para girar os números -->
-        <div class="number">
-            <button onclick="rotateNumber(0, 'up')">↑</button>
-            <span id="digit1">0</span>
-            <button onclick="rotateNumber(0, 'down')">↓</button>
-        </div>
-        <div class="number">
-            <button onclick="rotateNumber(1, 'up')">↑</button>
-            <span id="digit2">0</span>
-            <button onclick="rotateNumber(1, 'down')">↓</button>
-        </div>
-        <div class="number">
-            <button onclick="rotateNumber(2, 'up')">↑</button>
-            <span id="digit3">0</span>
-            <button onclick="rotateNumber(2, 'down')">↓</button>
-        </div>
-        <div class="number">
-            <button onclick="rotateNumber(3, 'up')">↑</button>
-            <span id="digit4">0</span>
-            <button onclick="rotateNumber(3, 'down')">↓</button>
-        </div>
-    </div>
-    <button id="confirmButton">Confirmar Senha</button>
-    <div id="message" class="message"></div>
-</div>
-
-<audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio>
-
-<script>
-    const correctPassword = [5, 2, 2, 5]; // Senha correta: 5225
-    const lockImage = document.getElementById('lockImage');
-    const messageDiv = document.getElementById('message');
-    const confirmButton = document.getElementById('confirmButton');
-    const victorySound = document.getElementById('victorySound'); // Som de vitória
-
-    let userPassword = [0, 0, 0, 0]; // Senha inicial (todas as posições começam com 0)
-
-    function rotateNumber(index, direction) {
-        if (direction === 'up') {
-            userPassword[index] = (userPassword[index] + 1) % 10; // Incrementa e volta para 0 após 9
-        } else {
-            userPassword[index] = (userPassword[index] - 1 + 10) % 10; // Decrementa e vai para 9 antes de 0
-        }
-
-        // Atualiza a tela com o novo número
-        document.getElementById(`digit${index + 1}`).textContent = userPassword[index];
     }
 
-    confirmButton.addEventListener('click', () => {
-        if (JSON.stringify(userPassword) === JSON.stringify(correctPassword)) {
-            // Senha correta
-            lockImage.style.display = 'none';
-            messageDiv.textContent = 'Parabéns! Você conseguiu, pode abrir a caixa vermelha!';
-            messageDiv.classList.add('success-message');
-            victorySound.play(); // Reproduz o som de vitória
-        } else {
-            // Senha incorreta
-            messageDiv.textContent = 'Senha incorreta. Tente novamente!';
-            messageDiv.classList.add('error-message');
-            lockImage.classList.add('error');
-
-            // Vibração do celular
-            if (navigator.vibrate) {
-                navigator.vibrate([200, 100, 200]); // Vibração forte
-            }
-
-            // Remove a classe de erro após a animação
-            setTimeout(() => {
-                lockImage.classList.remove('error');
-            }, 500);
-
-            // Reseta a senha
-            userPassword = [0, 0, 0, 0];
-            resetPasswordDisplay();
-        }
-    });
-
-    function resetPasswordDisplay() {
-        userPassword.forEach((num, index) => {
-            document.getElementById(`digit${index + 1}`).textContent = num;
-        });
+    void PegandoUrsinho()
+    {
+        pegando = true;
+        Debug.Log("Tentando pegar o ursinho!");
     }
-</script>
 
-</body>
-</html>
+    void OnTriggerEnter(Collider other)
+    {
+        // Verificar se a garra colidiu com o ursinho
+        if (other.CompareTag("Ursinho"))
+        {
+            Debug.Log("Você pegou o ursinho!");
+            other.gameObject.SetActive(false);  // Desativa o ursinho após pegá-lo
+            pegando = false;  // Reseta o estado da garra
+        }
+    }
+} 
+using UnityEngine;
+
+public class Ursinho : MonoBehaviour
+{
+    void Start()
+    {
+        // Defina um comportamento inicial, como a posição
+    }
+
+    void Update()
+    {
+        // Qualquer animação ou lógica adicional que o ursinho deva ter
+    }
+}
