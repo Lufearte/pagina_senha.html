@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadeado com Senha e Efeitos</title>
+    <title>Cadeado com Senha</title>
     <style>
         body {
             display: flex;
@@ -23,19 +23,6 @@
         .lock-image {
             width: 100px;
             height: 150px;
-            background-image: url('https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            margin-bottom: 20px;
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .lock-image-open {
-            width: 100px;
-            height: 150px;
             background-image: url('https://i.postimg.cc/hhfXG4Y0/ei-1734135446051-removebg-preview.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -44,7 +31,6 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            display: none; /* Inicialmente oculta */
         }
 
         .input-container {
@@ -133,8 +119,7 @@
         <p>Olá, Felipe! Bem-vindo!</p>
     </div>
     
-    <div class="lock-image"></div> <!-- Imagem do cadeado fechado -->
-    <div class="lock-image-open"></div> <!-- Imagem do cadeado aberto, inicialmente oculta -->
+    <div class="lock-image"></div> <!-- Imagem do cadeado -->
     
     <div class="input-container">
         <div class="input-field" id="input1" onclick="inputClick(1)">0</div>
@@ -159,7 +144,7 @@
 
 <script>
     let dials = [document.getElementById('input1'), document.getElementById('input2'), document.getElementById('input3'), document.getElementById('input4')];
-    let lockCode = [5, 2, 2, 5]; // A senha será 5225
+    let lockCode = [2, 5, 5, 2]; // A senha será 2552
     let userCode = [0, 0, 0, 0];
 
     // Função para vibrar o celular
@@ -194,7 +179,6 @@
 
             // Exibe a imagem do cadeado aberto
             document.querySelector('.lock-image').style.display = 'none'; // Esconde o cadeado fechado
-            document.querySelector('.lock-image-open').style.display = 'block'; // Exibe o cadeado aberto
 
             // Toca o som de sucesso
             let successSound = document.getElementById('successSound');
