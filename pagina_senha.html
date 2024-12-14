@@ -3,85 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadeado com Animações, Som e Erro</title>
+    <title>Cadeado com Senha</title>
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            margin-bottom: 30px;
         }
 
         .lock-container {
-            position: relative;
             text-align: center;
         }
 
         .lock-image {
-            width: 200px;
-            height: 300px;
-            background-image: url('https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            margin-bottom: 20px;
-            transition: transform 0.2s;
+            width: 150px;
+            height: auto;
+            margin-bottom: 30px;
+            transition: transform 0.2s ease-in-out;
         }
 
-        .dial {
+        .password-input {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .password-input input {
             width: 40px;
-            height: 60px;
-            background-color: #777;
-            display: inline-block;
-            margin: 0 5px;
+            height: 40px;
             text-align: center;
-            line-height: 60px;
-            font-size: 30px;
-            font-weight: bold;
-            color: white;
-            border-radius: 5px;
+            font-size: 24px;
+            margin: 0 5px;
+        }
+
+        .button-container {
+            margin-bottom: 20px;
+        }
+
+        .button-container button {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            margin: 5px;
             cursor: pointer;
         }
 
         .message {
             margin-top: 20px;
-            text-align: center;
-            font-size: 20px;
-            color: #333;
-            opacity: 0;
-            animation: fadeIn 1s forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .celebration {
-            font-size: 24px;
-            color: green;
+            font-size: 18px;
             font-weight: bold;
-            opacity: 0;
-            animation: fadeInCelebration 2s forwards;
         }
 
-        @keyframes fadeInCelebration {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
+        .success-message {
+            color: green;
         }
 
-        /* Animação de erro (vibração) */
+        .error-message {
+            color: red;
+        }
+
+        /* Animação de vibração */
         @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-10px);
+            }
+            50% {
+                transform: translateX(10px);
+            }
+            75% {
+                transform: translateX(-10px);
+            }
         }
 
         .error {
@@ -91,61 +94,80 @@
 </head>
 <body>
 
+<h1>Olá Felipe, clique nos números para digitar a senha</h1>
 <div class="lock-container">
-    <div class="lock-image"></div> <!-- Imagem do cadeado -->
-    <div>
-        <div class="dial"><span>0</span></div>
-        <div class="dial"><span>0</span></div>
-        <div class="dial"><span>0</span></div>
-        <div class="dial"><span>0</span></div>
+    <img id="lockImage" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado">
+    <div class="password-input">
+        <input type="text" maxlength="1" id="digit1" disabled>
+        <input type="text" maxlength="1" id="digit2" disabled>
+        <input type="text" maxlength="1" id="digit3" disabled>
+        <input type="text" maxlength="1" id="digit4" disabled>
     </div>
-    <div class="message">
-        <p>Digite a senha correta para abrir o cadeado!</p>
+    <div class="button-container">
+        <button class="number-btn" data-value="1">1</button>
+        <button class="number-btn" data-value="2">2</button>
+        <button class="number-btn" data-value="3">3</button>
+        <button class="number-btn" data-value="4">4</button>
+        <button class="number-btn" data-value="5">5</button>
+        <button class="number-btn" data-value="6">6</button>
+        <button class="number-btn" data-value="7">7</button>
+        <button class="number-btn" data-value="8">8</button>
+        <button class="number-btn" data-value="9">9</button>
+        <button class="number-btn" data-value="0">0</button>
     </div>
-    <div class="celebration" style="display: none;">
-        <p>Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!</p>
-    </div>
+    <button id="confirmButton">Confirmar Senha</button>
+    <div id="message" class="message"></div>
 </div>
 
-<!-- Adicionando o efeito sonoro -->
-<audio id="successSound" src="https://youtu.be/IJzSNwzN6C4?si=1LLvaujfcLx4vMec" preload="auto"></audio>
-<audio id="errorSound" src="erro.mp3" preload="auto"></audio>
+<audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio> <!-- Link do som -->
+<!-- Substitua o link acima pelo link do YouTube convertido para mp3 -->
 
 <script>
-    let dials = document.querySelectorAll('.dial');
-    let lockCode = [5, 2, 2, 5]; // A senha será 5225
-    let userCode = [];
+    const correctPassword = [5, 2, 2, 5]; // Senha correta: 5225
+    const lockImage = document.getElementById('lockImage');
+    const messageDiv = document.getElementById('message');
+    const confirmButton = document.getElementById('confirmButton');
+    const inputs = Array.from(document.querySelectorAll('.password-input input'));
+    const victorySound = document.getElementById('victorySound'); // Som de vitória
+    const numberButtons = document.querySelectorAll('.number-btn');
 
-    dials.forEach((dial, index) => {
-        dial.addEventListener('click', () => {
-            let currentDigit = parseInt(dial.innerText);
-            currentDigit = (currentDigit + 1) % 10;  // Incrementa o número, vai de 0 a 9
-            dial.innerText = currentDigit;
-
-            // Salva a tentativa do usuário
-            userCode[index] = currentDigit;
-
-            // Verifica se a senha está correta
-            if (userCode.toString() === lockCode.toString()) {
-                document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
-                let celebrationMessage = document.querySelector('.celebration');
-                celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
-
-                // Toca o som de sucesso
-                let successSound = document.getElementById('successSound');
-                successSound.play();
-
-                // Remove qualquer efeito de erro anterior
-                document.querySelector('.lock-image').classList.remove('error');
-            } else {
-                // Se a senha estiver errada, aplica o efeito de erro
-                document.querySelector('.lock-image').classList.add('error');
-
-                // Toca o som de erro
-                let errorSound = document.getElementById('errorSound');
-                errorSound.play();
+    // Função para preencher os campos de senha
+    numberButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            for (let i = 0; i < inputs.length; i++) {
+                if (inputs[i].value === '') {
+                    inputs[i].value = button.getAttribute('data-value');
+                    break;
+                }
             }
         });
+    });
+
+    confirmButton.addEventListener('click', () => {
+        const userPassword = inputs.map(input => parseInt(input.value, 10));
+
+        if (JSON.stringify(userPassword) === JSON.stringify(correctPassword)) {
+            // Senha correta
+            lockImage.style.display = 'none';
+            messageDiv.textContent = 'Parabéns! Você conseguiu, pode abrir a caixa vermelha!';
+            messageDiv.classList.add('success-message');
+            victorySound.play(); // Reproduz o som de vitória
+        } else {
+            // Senha incorreta
+            messageDiv.textContent = 'Senha incorreta. Tente novamente!';
+            messageDiv.classList.add('error-message');
+            lockImage.classList.add('error');
+
+            // Vibração do celular
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]); // Vibração forte
+            }
+
+            // Remove a classe de erro após a animação
+            setTimeout(() => {
+                lockImage.classList.remove('error');
+            }, 500);
+        }
     });
 </script>
 
