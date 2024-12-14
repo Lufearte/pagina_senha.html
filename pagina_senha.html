@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadeado com Senha</title>
+    <title>Cadeado com Senha por Cliques</title>
     <style>
         body {
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f2f2f2;
+            background-color: #f9f9f9;
             font-family: Arial, sans-serif;
         }
 
-        h1 {
-            margin-bottom: 30px;
+        .welcome-message {
+            position: absolute;
+            top: 20px;
+            font-size: 24px;
+            color: #333;
         }
 
         .lock-container {
@@ -26,107 +29,110 @@
 
         .lock-image {
             width: 150px;
-            height: auto;
-            margin-bottom: 30px;
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .password-input {
-            display: flex;
-            justify-content: center;
             margin-bottom: 20px;
         }
 
-        .password-input input {
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            font-size: 24px;
-            margin: 0 5px;
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .message {
+        .digit-button {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .digit-button:hover {
+            background-color: #0056b3;
+        }
+
+        .confirm-button {
             margin-top: 20px;
+            padding: 10px 20px;
             font-size: 18px;
-            font-weight: bold;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .confirm-button:hover {
+            background-color: #1e7e34;
         }
 
         .success-message {
+            display: none;
+            font-size: 22px;
+            font-weight: bold;
             color: green;
+            margin-top: 20px;
         }
 
-        .error-message {
-            color: red;
-        }
-
-        /* Animação de vibração */
         @keyframes shake {
-            0%, 100% {
-                transform: translateX(0);
-            }
-            25% {
-                transform: translateX(-10px);
-            }
-            50% {
-                transform: translateX(10px);
-            }
-            75% {
-                transform: translateX(-10px);
-            }
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
         }
 
         .error {
-            animation: shake 0.5s ease-in-out;
+            animation: shake 0.5s;
         }
     </style>
 </head>
 <body>
 
-<h1>Olá Felipe, digite a senha</h1>
+<div class="welcome-message">Olá Felipe!</div>
+
 <div class="lock-container">
-    <img id="lockImage" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado">
-    <div class="password-input">
-        <input type="text" maxlength="1" id="digit1">
-        <input type="text" maxlength="1" id="digit2">
-        <input type="text" maxlength="1" id="digit3">
-        <input type="text" maxlength="1" id="digit4">
+    <img class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado fechado">
+    <div class="button-container">
+        <button class="digit-button">0</button>
+        <button class="digit-button">0</button>
+        <button class="digit-button">0</button>
+        <button class="digit-button">0</button>
     </div>
-    <button id="confirmButton">Confirmar Senha</button>
-    <div id="message" class="message"></div>
+    <button class="confirm-button">Confirmar</button>
+    <div class="success-message">Parabéns! Você conseguiu, pode abrir a caixa vermelha!</div>
 </div>
 
-<audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio> <!-- Link do som -->
-<!-- Substitua o link acima pelo link do YouTube convertido para mp3 -->
+<audio id="successSound" src="https://youtu.be/IJzSNwzN6C4?si=1LLvaujfcLx4vMec" preload="auto"></audio>
 
 <script>
-    const correctPassword = [5, 2, 2, 5]; // Senha correta: 5225
-    const lockImage = document.getElementById('lockImage');
-    const messageDiv = document.getElementById('message');
-    const confirmButton = document.getElementById('confirmButton');
-    const inputs = Array.from(document.querySelectorAll('.password-input input'));
-    const victorySound = document.getElementById('victorySound'); // Som de vitória
+    const buttons = document.querySelectorAll('.digit-button');
+    const confirmButton = document.querySelector('.confirm-button');
+    const successMessage = document.querySelector('.success-message');
+    const lockImage = document.querySelector('.lock-image');
+    const successSound = document.getElementById('successSound');
+
+    let userCode = [0, 0, 0, 0];
+    const correctCode = [5, 2, 2, 5];
+
+    buttons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            userCode[index] = (userCode[index] + 1) % 10; // Incrementa o número
+            button.textContent = userCode[index];
+        });
+    });
 
     confirmButton.addEventListener('click', () => {
-        const userPassword = inputs.map(input => parseInt(input.value, 10));
-
-        if (JSON.stringify(userPassword) === JSON.stringify(correctPassword)) {
-            // Senha correta
-            lockImage.style.display = 'none';
-            messageDiv.textContent = 'Parabéns! Você conseguiu, pode abrir a caixa vermelha!';
-            messageDiv.classList.add('success-message');
-            victorySound.play(); // Reproduz o som de vitória
+        if (userCode.toString() === correctCode.toString()) {
+            lockImage.style.display = 'none'; // Remove o cadeado fechado
+            successMessage.style.display = 'block'; // Mostra a mensagem de sucesso
+            successSound.play(); // Toca o som de vitória
         } else {
-            // Senha incorreta
-            messageDiv.textContent = 'Senha incorreta. Tente novamente!';
-            messageDiv.classList.add('error-message');
+            // Aplica a animação de erro
             lockImage.classList.add('error');
-
-            // Vibração do celular
-            if (navigator.vibrate) {
-                navigator.vibrate([200, 100, 200]); // Vibração forte
-            }
-
-            // Remove a classe de erro após a animação
+            navigator.vibrate(500); // Vibra por 500ms
             setTimeout(() => {
                 lockImage.classList.remove('error');
             }, 500);
