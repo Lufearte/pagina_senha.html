@@ -26,17 +26,35 @@
             background-size: contain;
             background-repeat: no-repeat;
             margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
+            position: absolute;
+            top: -100px; /* Posiciona o cadeado acima dos números */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        .lock-image-open {
+            width: 200px;
+            height: 300px;
+            background-image: url('https://i.postimg.cc/hhfXG4Y0/ei-1734135446051-removebg-preview.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-bottom: 20px;
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: none; /* Inicialmente oculta */
         }
 
         .dial-container {
             position: absolute;
-            top: 50%;
+            top: 60%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             display: flex;
-            z-index: 2;
+            z-index: 1;
         }
 
         .dial {
@@ -111,7 +129,8 @@
         <p>Olá, Felipe! Bem-vindo!</p>
     </div>
     
-    <div class="lock-image"></div> <!-- Imagem do cadeado -->
+    <div class="lock-image"></div> <!-- Imagem do cadeado fechado -->
+    <div class="lock-image-open"></div> <!-- Imagem do cadeado aberto, inicialmente oculta -->
     
     <div class="dial-container">
         <div class="dial"><span>0</span></div>
@@ -137,6 +156,13 @@
     let lockCode = [5, 2, 2, 5]; // A senha será 5225
     let userCode = [];
 
+    // Função para vibrar o celular
+    function vibrate() {
+        if (navigator.vibrate) {
+            navigator.vibrate([300, 100, 300]); // Vibração forte
+        }
+    }
+
     // Adiciona os eventos de clique para os números
     dials.forEach((dial, index) => {
         dial.addEventListener('click', () => {
@@ -153,6 +179,10 @@
                 let celebrationMessage = document.querySelector('.celebration');
                 celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
 
+                // Exibe a imagem do cadeado aberto
+                document.querySelector('.lock-image').style.display = 'none'; // Esconde o cadeado fechado
+                document.querySelector('.lock-image-open').style.display = 'block'; // Exibe o cadeado aberto
+
                 // Toca o som de sucesso
                 let successSound = document.getElementById('successSound');
                 successSound.play();
@@ -166,6 +196,9 @@
                 // Toca o som de erro
                 let errorSound = document.getElementById('errorSound');
                 errorSound.play();
+
+                // Vibra o celular
+                vibrate();
             }
         });
     });
