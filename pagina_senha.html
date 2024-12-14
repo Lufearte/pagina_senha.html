@@ -23,14 +23,28 @@
         .lock-image {
             width: 100px;
             height: 150px;
-            background-image: url('https://i.postimg.cc/hhfXG4Y0/ei-1734135446051-removebg-preview.png');
+            background-image: url('https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png');
             background-size: contain;
             background-repeat: no-repeat;
             margin-bottom: 20px;
             position: absolute;
-            top: 0;
+            top: -30px; /* Ajusta a posição para cima */
             left: 50%;
             transform: translateX(-50%);
+        }
+
+        .lock-image-open {
+            width: 100px;
+            height: 150px;
+            background-image: url('https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png'); /* Substitua por a imagem do cadeado aberto */
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-bottom: 20px;
+            position: absolute;
+            top: -30px; /* Ajusta a posição para cima */
+            left: 50%;
+            transform: translateX(-50%);
+            display: none; /* Inicialmente oculto */
         }
 
         .input-container {
@@ -119,7 +133,8 @@
         <p>Olá, Felipe! Bem-vindo!</p>
     </div>
     
-    <div class="lock-image"></div> <!-- Imagem do cadeado -->
+    <div class="lock-image" id="lockImage"></div> <!-- Imagem do cadeado fechado -->
+    <div class="lock-image-open" id="lockImageOpen"></div> <!-- Imagem do cadeado aberto -->
     
     <div class="input-container">
         <div class="input-field" id="input1" onclick="inputClick(1)">0</div>
@@ -178,14 +193,15 @@
             celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
 
             // Exibe a imagem do cadeado aberto
-            document.querySelector('.lock-image').style.display = 'none'; // Esconde o cadeado fechado
+            document.getElementById('lockImage').style.display = 'none'; // Esconde o cadeado fechado
+            document.getElementById('lockImageOpen').style.display = 'block'; // Exibe o cadeado aberto
 
             // Toca o som de sucesso
             let successSound = document.getElementById('successSound');
             successSound.play();
         } else {
             // Se a senha estiver errada, aplica o efeito de erro
-            document.querySelector('.lock-image').classList.add('error');
+            document.getElementById('lockImage').classList.add('error');
 
             // Toca o som de erro
             let errorSound = document.getElementById('errorSound');
