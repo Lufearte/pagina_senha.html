@@ -1,56 +1,202 @@
-using UnityEngine;
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadeado com Senha</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
+        }
 
-public class GarraControl : MonoBehaviour
-{
-    public float velocidade = 5f;  // Velocidade da garra
-    public float alcance = 3f;    // Distância que a garra pode alcançar
-    private bool pegando = false; // Se a garra está pegando o ursinho
+        h1 {
+            margin-bottom: 30px;
+        }
 
-    void Update()
-    {
-        // Movimento horizontal (esquerda e direita)
-        float movimentoHorizontal = Input.GetAxis("Horizontal") * velocidade * Time.deltaTime;
-        transform.Translate(movimentoHorizontal, 0, 0);
+        .lock-container {
+            text-align: center;
+        }
 
-        // Movimento vertical (para frente e para trás)
-        float movimentoVertical = Input.GetAxis("Vertical") * velocidade * Time.deltaTime;
-        transform.Translate(0, 0, movimentoVertical);
+        .lock-image {
+            width: 150px;
+            height: auto;
+            margin-bottom: 30px;
+            transition: transform 1s ease-in-out; /* Efeito de rotação suave */
+        }
 
-        // Tentar pegar o ursinho
-        if (Input.GetKeyDown(KeyCode.Space) && !pegando)
-        {
-            PegandoUrsinho();
+        .password-input {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .password-input div {
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            text-align: center;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ccc;
+        }
+
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .button-container button {
+            font-size: 24px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+        }
+
+        .button-container button:hover {
+            background-color: #ccc;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: green;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        /* Animação de vibração */
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-10px);
+            }
+            50% {
+                transform: translateX(10px);
+            }
+            75% {
+                transform: translateX(-10px);
+            }
+        }
+
+        .error {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* Animação de rotação */
+        @keyframes rotateLock {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .rotate {
+            animation: rotateLock 1s ease-in-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Olá Felipe, clique nos números para digitar a senha</h1>
+<div class="lock-container">
+    <img id="lockImage" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado">
+    <div class="password-input">
+        <div id="digit1"></div>
+        <div id="digit2"></div>
+        <div id="digit3"></div>
+        <div id="digit4"></div>
+    </div>
+    <div class="button-container">
+        <button onclick="setDigit(1)">1</button>
+        <button onclick="setDigit(2)">2</button>
+        <button onclick="setDigit(3)">3</button>
+        <button onclick="setDigit(4)">4</button>
+        <button onclick="setDigit(5)">5</button>
+        <button onclick="setDigit(6)">6</button>
+        <button onclick="setDigit(7)">7</button>
+        <button onclick="setDigit(8)">8</button>
+        <button onclick="setDigit(9)">9</button>
+        <button onclick="setDigit(0)">0</button>
+    </div>
+    <button id="confirmButton">Confirmar Senha</button>
+    <div id="message" class="message"></div>
+</div>
+
+<audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio> <!-- Link do som -->
+
+<script>
+    const correctPassword = [5, 2, 2, 5]; // Senha correta: 5225
+    const lockImage = document.getElementById('lockImage');
+    const messageDiv = document.getElementById('message');
+    const confirmButton = document.getElementById('confirmButton');
+    const digits = [document.getElementById('digit1'), document.getElementById('digit2'), document.getElementById('digit3'), document.getElementById('digit4')];
+    const victorySound = document.getElementById('victorySound'); // Som de vitória
+
+    let enteredPassword = [];
+
+    function setDigit(digit) {
+        // Encontra o primeiro campo vazio e adiciona o número
+        for (let i = 0; i < digits.length; i++) {
+            if (digits[i].textContent === "") {
+                digits[i].textContent = digit;
+                enteredPassword.push(digit);
+                break;
+            }
         }
     }
 
-    void PegandoUrsinho()
-    {
-        pegando = true;
-        Debug.Log("Tentando pegar o ursinho!");
-    }
+    confirmButton.addEventListener('click', () => {
+        if (enteredPassword.length === 4) {
+            const userPassword = enteredPassword;
 
-    void OnTriggerEnter(Collider other)
-    {
-        // Verificar se a garra colidiu com o ursinho
-        if (other.CompareTag("Ursinho"))
-        {
-            Debug.Log("Você pegou o ursinho!");
-            other.gameObject.SetActive(false);  // Desativa o ursinho após pegá-lo
-            pegando = false;  // Reseta o estado da garra
+            if (JSON.stringify(userPassword) === JSON.stringify(correctPassword)) {
+                // Senha correta
+                lockImage.style.display = 'none';
+                messageDiv.textContent = 'Parabéns! Você conseguiu, pode abrir a caixa vermelha!';
+                messageDiv.classList.add('success-message');
+                victorySound.play(); // Reproduz o som de vitória
+                lockImage.classList.add('rotate'); // Adiciona o efeito de rotação
+            } else {
+                // Senha incorreta
+                messageDiv.textContent = 'Senha incorreta. Tente novamente!';
+                messageDiv.classList.add('error-message');
+                lockImage.classList.add('error');
+
+                // Vibração do celular
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]); // Vibração forte
+                }
+
+                // Remove a classe de erro após a animação
+                setTimeout(() => {
+                    lockImage.classList.remove('error');
+                }, 500);
+            }
         }
-    }
-} 
-using UnityEngine;
+    });
+</script>
 
-public class Ursinho : MonoBehaviour
-{
-    void Start()
-    {
-        // Defina um comportamento inicial, como a posição
-    }
-
-    void Update()
-    {
-        // Qualquer animação ou lógica adicional que o ursinho deva ter
-    }
-}
+</body>
+</html>
