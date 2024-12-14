@@ -31,27 +31,32 @@
             transition: transform 0.2s ease-in-out;
         }
 
-        .buttons-container {
+        .number-container {
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
             margin-bottom: 20px;
         }
 
-        .button {
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
-            margin: 5px;
-            cursor: pointer;
-            border: 2px solid #000;
-            border-radius: 5px;
-            background-color: #fff;
-            transition: background-color 0.2s;
+        .number {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 10px;
         }
 
-        .button:hover {
-            background-color: #ddd;
+        .number button {
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .number span {
+            font-size: 24px;
+            margin: 10px 0;
         }
 
         .message {
@@ -94,25 +99,34 @@
 <h1>Olá Felipe, digite a senha</h1>
 <div class="lock-container">
     <img id="lockImage" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado">
-    <div class="buttons-container">
-        <!-- Botões de 0 a 9 para a senha -->
-        <button class="button" onclick="addToPassword(1)">1</button>
-        <button class="button" onclick="addToPassword(2)">2</button>
-        <button class="button" onclick="addToPassword(3)">3</button>
-        <button class="button" onclick="addToPassword(4)">4</button>
-        <button class="button" onclick="addToPassword(5)">5</button>
-        <button class="button" onclick="addToPassword(6)">6</button>
-        <button class="button" onclick="addToPassword(7)">7</button>
-        <button class="button" onclick="addToPassword(8)">8</button>
-        <button class="button" onclick="addToPassword(9)">9</button>
-        <button class="button" onclick="addToPassword(0)">0</button>
+    <div class="number-container">
+        <!-- Rodas para girar os números -->
+        <div class="number">
+            <button onclick="rotateNumber(0, 'up')">↑</button>
+            <span id="digit1">0</span>
+            <button onclick="rotateNumber(0, 'down')">↓</button>
+        </div>
+        <div class="number">
+            <button onclick="rotateNumber(1, 'up')">↑</button>
+            <span id="digit2">0</span>
+            <button onclick="rotateNumber(1, 'down')">↓</button>
+        </div>
+        <div class="number">
+            <button onclick="rotateNumber(2, 'up')">↑</button>
+            <span id="digit3">0</span>
+            <button onclick="rotateNumber(2, 'down')">↓</button>
+        </div>
+        <div class="number">
+            <button onclick="rotateNumber(3, 'up')">↑</button>
+            <span id="digit4">0</span>
+            <button onclick="rotateNumber(3, 'down')">↓</button>
+        </div>
     </div>
     <button id="confirmButton">Confirmar Senha</button>
     <div id="message" class="message"></div>
 </div>
 
-<audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio> <!-- Link do som -->
-<!-- Substitua o link acima pelo link do YouTube convertido para mp3 -->
+<audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio>
 
 <script>
     const correctPassword = [5, 2, 2, 5]; // Senha correta: 5225
@@ -121,13 +135,17 @@
     const confirmButton = document.getElementById('confirmButton');
     const victorySound = document.getElementById('victorySound'); // Som de vitória
 
-    let userPassword = []; // Senha do usuário
+    let userPassword = [0, 0, 0, 0]; // Senha inicial (todas as posições começam com 0)
 
-    function addToPassword(num) {
-        if (userPassword.length < 4) {
-            userPassword.push(num);
-            console.log(userPassword); // Exibe a senha atual para teste
+    function rotateNumber(index, direction) {
+        if (direction === 'up') {
+            userPassword[index] = (userPassword[index] + 1) % 10; // Incrementa e volta para 0 após 9
+        } else {
+            userPassword[index] = (userPassword[index] - 1 + 10) % 10; // Decrementa e vai para 9 antes de 0
         }
+
+        // Atualiza a tela com o novo número
+        document.getElementById(`digit${index + 1}`).textContent = userPassword[index];
     }
 
     confirmButton.addEventListener('click', () => {
@@ -154,9 +172,16 @@
             }, 500);
 
             // Reseta a senha
-            userPassword = [];
+            userPassword = [0, 0, 0, 0];
+            resetPasswordDisplay();
         }
     });
+
+    function resetPasswordDisplay() {
+        userPassword.forEach((num, index) => {
+            document.getElementById(`digit${index + 1}`).textContent = num;
+        });
+    }
 </script>
 
 </body>
