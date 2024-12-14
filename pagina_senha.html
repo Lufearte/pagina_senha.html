@@ -12,7 +12,15 @@
             height: 100vh;
             margin: 0;
             background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
             text-align: center;
+            flex-direction: column;
+        }
+
+        .message {
+            font-size: 24px;
+            color: #333;
+            margin-top: 20px;
         }
 
         .lock-container {
@@ -21,66 +29,46 @@
         }
 
         .lock-image {
-            width: 100px;
-            height: 150px;
+            width: 200px;
+            height: 300px;
             background-image: url('https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png');
             background-size: contain;
             background-repeat: no-repeat;
             margin-bottom: 20px;
-            position: absolute;
-            top: -30px; /* Ajusta a posição para cima */
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .lock-image-open {
-            width: 100px;
-            height: 150px;
-            background-image: url('https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png'); /* Substitua por a imagem do cadeado aberto */
-            background-size: contain;
-            background-repeat: no-repeat;
-            margin-bottom: 20px;
-            position: absolute;
-            top: -30px; /* Ajusta a posição para cima */
-            left: 50%;
-            transform: translateX(-50%);
-            display: none; /* Inicialmente oculto */
+            transition: transform 0.5s ease-in-out;
         }
 
         .input-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
+            margin: 20px;
         }
 
-        .input-field {
-            width: 40px;
-            height: 60px;
-            text-align: center;
+        .input-container input {
+            width: 50px;
+            height: 50px;
             font-size: 30px;
-            font-weight: bold;
-            margin: 0 5px;
-            background-color: #777;
-            color: white;
+            text-align: center;
+            margin: 5px;
             border-radius: 5px;
-            cursor: pointer;
+            border: 2px solid #ccc;
         }
 
-        .input-field:focus {
-            outline: none;
+        .error {
+            animation: shake 0.5s ease-in-out;
         }
 
-        .message {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #333;
+        /* Animação de erro (vibração) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
         }
 
         .celebration {
             font-size: 24px;
             color: green;
             font-weight: bold;
-            margin-top: 20px;
             opacity: 0;
             animation: fadeInCelebration 2s forwards;
         }
@@ -90,135 +78,82 @@
             100% { opacity: 1; }
         }
 
-        .welcome-message {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .error {
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
-        }
-
-        .button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
+        .confirm-button {
             background-color: #4CAF50;
             color: white;
+            padding: 10px 20px;
             border: none;
+            font-size: 18px;
             border-radius: 5px;
             cursor: pointer;
-            display: none; /* Inicialmente oculto */
+            margin-top: 20px;
         }
 
-        .button:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
+        .confirm-button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
 
-<div class="lock-container">
-    <div class="welcome-message">
-        <p>Olá, Felipe! Bem-vindo!</p>
-    </div>
-    
-    <div class="lock-image" id="lockImage"></div> <!-- Imagem do cadeado fechado -->
-    <div class="lock-image-open" id="lockImageOpen"></div> <!-- Imagem do cadeado aberto -->
-    
-    <div class="input-container">
-        <div class="input-field" id="input1" onclick="inputClick(1)">0</div>
-        <div class="input-field" id="input2" onclick="inputClick(2)">0</div>
-        <div class="input-field" id="input3" onclick="inputClick(3)">0</div>
-        <div class="input-field" id="input4" onclick="inputClick(4)">0</div>
+    <div class="message" id="welcome-message">
+        Olá, Felipe! Digite a senha:
     </div>
 
-    <button class="button" id="confirmButton" onclick="checkPassword()">Confirmar Senha</button>
-
-    <div class="message">
-        <p>Digite a senha correta para abrir o cadeado!</p>
+    <div class="lock-container">
+        <div class="lock-image" id="lock-image"></div>
+        <div class="input-container">
+            <input type="number" id="input1" maxlength="1">
+            <input type="number" id="input2" maxlength="1">
+            <input type="number" id="input3" maxlength="1">
+            <input type="number" id="input4" maxlength="1">
+        </div>
+        <button class="confirm-button" id="confirm-button">Confirmar Senha</button>
+        <div class="celebration" id="celebration-message"></div>
     </div>
-    
-    <div class="celebration" style="display: none;">
-        <p>Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!</p>
-    </div>
-</div>
 
-<audio id="successSound" src="sucesso.mp3" preload="auto"></audio>
-<audio id="errorSound" src="erro.mp3" preload="auto"></audio>
+    <audio id="error-sound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+    <audio id="success-sound" src="https://www.soundjay.com/button/beep-08b.wav" preload="auto"></audio>
 
-<script>
-    let dials = [document.getElementById('input1'), document.getElementById('input2'), document.getElementById('input3'), document.getElementById('input4')];
-    let lockCode = [2, 5, 5, 2]; // A senha será 2552
-    let userCode = [0, 0, 0, 0];
+    <script>
+        const correctPassword = "2552";  // Senha correta
+        let currentInput = ["", "", "", ""]; // Armazenando os valores dos campos
 
-    // Função para vibrar o celular
-    function vibrate() {
-        if (navigator.vibrate) {
-            navigator.vibrate([300, 100, 300]); // Vibração forte
-        }
-    }
+        const inputs = document.querySelectorAll('input');
+        const confirmButton = document.getElementById('confirm-button');
+        const lockImage = document.getElementById('lock-image');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const celebrationMessage = document.getElementById('celebration-message');
+        const errorSound = document.getElementById('error-sound');
+        const successSound = document.getElementById('success-sound');
 
-    // Função para lidar com o clique no campo de entrada
-    function inputClick(index) {
-        let currentDigit = userCode[index - 1];
-        currentDigit = (currentDigit + 1) % 10;  // Incrementa o número, vai de 0 a 9
-        userCode[index - 1] = currentDigit;
+        // Adicionando evento de input
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                currentInput[index] = input.value;  // Armazenando valor digitado no campo
+            });
+        });
 
-        // Atualiza o valor no campo
-        dials[index - 1].innerText = currentDigit;
+        // Função para validar a senha
+        confirmButton.addEventListener('click', () => {
+            if (currentInput.join('') === correctPassword) {
+                // Se a senha estiver correta, mudar a imagem e mostrar a mensagem de sucesso
+                lockImage.style.display = 'none'; // Cadeado some
+                celebrationMessage.innerText = "Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!";
+                celebrationMessage.style.opacity = 1;
+                successSound.play();
+            } else {
+                // Se a senha estiver errada, aplicar animação de erro e tocar som
+                lockImage.classList.add('error');
+                errorSound.play();
 
-        // Habilita o botão de confirmar quando todos os campos forem preenchidos
-        if (userCode.every(num => num !== 0)) {
-            document.getElementById('confirmButton').style.display = 'block';
-        }
-    }
-
-    // Função para checar a senha
-    function checkPassword() {
-        if (userCode.toString() === lockCode.toString()) {
-            // Exibe a mensagem de sucesso
-            document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
-            let celebrationMessage = document.querySelector('.celebration');
-            celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
-
-            // Exibe a imagem do cadeado aberto
-            document.getElementById('lockImage').style.display = 'none'; // Esconde o cadeado fechado
-            document.getElementById('lockImageOpen').style.display = 'block'; // Exibe o cadeado aberto
-
-            // Toca o som de sucesso
-            let successSound = document.getElementById('successSound');
-            successSound.play();
-        } else {
-            // Se a senha estiver errada, aplica o efeito de erro
-            document.getElementById('lockImage').classList.add('error');
-
-            // Toca o som de erro
-            let errorSound = document.getElementById('errorSound');
-            errorSound.play();
-
-            // Vibra o celular
-            vibrate();
-
-            // Desabilita o botão de confirmação
-            document.getElementById('confirmButton').style.display = 'none';
-
-            // Reseta os campos
-            userCode = [0, 0, 0, 0];
-            dials.forEach(dial => dial.innerText = '0');
-        }
-    }
-</script>
+                // Remover a animação após ela ter terminado
+                setTimeout(() => {
+                    lockImage.classList.remove('error');
+                }, 500);
+            }
+        });
+    </script>
 
 </body>
 </html>
