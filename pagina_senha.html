@@ -28,44 +28,30 @@
             width: 150px;
             height: auto;
             margin-bottom: 30px;
-            transition: transform 1s ease-in-out; /* Efeito de rotação suave */
+            transition: transform 0.2s ease-in-out;
         }
 
-        .password-input {
+        .buttons-container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             margin-bottom: 20px;
         }
 
-        .password-input div {
-            width: 40px;
-            height: 40px;
-            margin: 0 5px;
-            text-align: center;
+        .button {
+            width: 50px;
+            height: 50px;
             font-size: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #ccc;
-        }
-
-        .button-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .button-container button {
-            font-size: 24px;
-            padding: 10px;
+            margin: 5px;
             cursor: pointer;
-            background-color: #e0e0e0;
-            border: 1px solid #ccc;
+            border: 2px solid #000;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: background-color 0.2s;
         }
 
-        .button-container button:hover {
-            background-color: #ccc;
+        .button:hover {
+            background-color: #ddd;
         }
 
         .message {
@@ -101,99 +87,74 @@
         .error {
             animation: shake 0.5s ease-in-out;
         }
-
-        /* Animação de rotação */
-        @keyframes rotateLock {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .rotate {
-            animation: rotateLock 1s ease-in-out forwards;
-        }
     </style>
 </head>
 <body>
 
-<h1>Olá Felipe, clique nos números para digitar a senha</h1>
+<h1>Olá Felipe, digite a senha</h1>
 <div class="lock-container">
     <img id="lockImage" class="lock-image" src="https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png" alt="Cadeado">
-    <div class="password-input">
-        <div id="digit1"></div>
-        <div id="digit2"></div>
-        <div id="digit3"></div>
-        <div id="digit4"></div>
-    </div>
-    <div class="button-container">
-        <button onclick="setDigit(1)">1</button>
-        <button onclick="setDigit(2)">2</button>
-        <button onclick="setDigit(3)">3</button>
-        <button onclick="setDigit(4)">4</button>
-        <button onclick="setDigit(5)">5</button>
-        <button onclick="setDigit(6)">6</button>
-        <button onclick="setDigit(7)">7</button>
-        <button onclick="setDigit(8)">8</button>
-        <button onclick="setDigit(9)">9</button>
-        <button onclick="setDigit(0)">0</button>
+    <div class="buttons-container">
+        <!-- Botões de 0 a 9 para a senha -->
+        <button class="button" onclick="addToPassword(1)">1</button>
+        <button class="button" onclick="addToPassword(2)">2</button>
+        <button class="button" onclick="addToPassword(3)">3</button>
+        <button class="button" onclick="addToPassword(4)">4</button>
+        <button class="button" onclick="addToPassword(5)">5</button>
+        <button class="button" onclick="addToPassword(6)">6</button>
+        <button class="button" onclick="addToPassword(7)">7</button>
+        <button class="button" onclick="addToPassword(8)">8</button>
+        <button class="button" onclick="addToPassword(9)">9</button>
+        <button class="button" onclick="addToPassword(0)">0</button>
     </div>
     <button id="confirmButton">Confirmar Senha</button>
     <div id="message" class="message"></div>
 </div>
 
 <audio id="victorySound" src="https://www.myinstants.com/media/sounds/success.mp3"></audio> <!-- Link do som -->
+<!-- Substitua o link acima pelo link do YouTube convertido para mp3 -->
 
 <script>
     const correctPassword = [5, 2, 2, 5]; // Senha correta: 5225
     const lockImage = document.getElementById('lockImage');
     const messageDiv = document.getElementById('message');
     const confirmButton = document.getElementById('confirmButton');
-    const digits = [document.getElementById('digit1'), document.getElementById('digit2'), document.getElementById('digit3'), document.getElementById('digit4')];
     const victorySound = document.getElementById('victorySound'); // Som de vitória
 
-    let enteredPassword = [];
+    let userPassword = []; // Senha do usuário
 
-    function setDigit(digit) {
-        // Encontra o primeiro campo vazio e adiciona o número
-        for (let i = 0; i < digits.length; i++) {
-            if (digits[i].textContent === "") {
-                digits[i].textContent = digit;
-                enteredPassword.push(digit);
-                break;
-            }
+    function addToPassword(num) {
+        if (userPassword.length < 4) {
+            userPassword.push(num);
+            console.log(userPassword); // Exibe a senha atual para teste
         }
     }
 
     confirmButton.addEventListener('click', () => {
-        if (enteredPassword.length === 4) {
-            const userPassword = enteredPassword;
+        if (JSON.stringify(userPassword) === JSON.stringify(correctPassword)) {
+            // Senha correta
+            lockImage.style.display = 'none';
+            messageDiv.textContent = 'Parabéns! Você conseguiu, pode abrir a caixa vermelha!';
+            messageDiv.classList.add('success-message');
+            victorySound.play(); // Reproduz o som de vitória
+        } else {
+            // Senha incorreta
+            messageDiv.textContent = 'Senha incorreta. Tente novamente!';
+            messageDiv.classList.add('error-message');
+            lockImage.classList.add('error');
 
-            if (JSON.stringify(userPassword) === JSON.stringify(correctPassword)) {
-                // Senha correta
-                lockImage.style.display = 'none';
-                messageDiv.textContent = 'Parabéns! Você conseguiu, pode abrir a caixa vermelha!';
-                messageDiv.classList.add('success-message');
-                victorySound.play(); // Reproduz o som de vitória
-                lockImage.classList.add('rotate'); // Adiciona o efeito de rotação
-            } else {
-                // Senha incorreta
-                messageDiv.textContent = 'Senha incorreta. Tente novamente!';
-                messageDiv.classList.add('error-message');
-                lockImage.classList.add('error');
-
-                // Vibração do celular
-                if (navigator.vibrate) {
-                    navigator.vibrate([200, 100, 200]); // Vibração forte
-                }
-
-                // Remove a classe de erro após a animação
-                setTimeout(() => {
-                    lockImage.classList.remove('error');
-                }, 500);
+            // Vibração do celular
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]); // Vibração forte
             }
+
+            // Remove a classe de erro após a animação
+            setTimeout(() => {
+                lockImage.classList.remove('error');
+            }, 500);
+
+            // Reseta a senha
+            userPassword = [];
         }
     });
 </script>
