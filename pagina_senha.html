@@ -17,83 +17,70 @@
 
         .lock-container {
             position: relative;
+            text-align: center;
         }
 
         .lock-image {
-            width: 200px;
-            height: 300px;
+            width: 100px;
+            height: 150px;
             background-image: url('https://i.postimg.cc/DW2Jgrwr/ei-1734134378903-removebg-preview.png');
             background-size: contain;
             background-repeat: no-repeat;
             margin-bottom: 20px;
             position: absolute;
-            top: -100px; /* Posiciona o cadeado acima dos números */
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 2;
         }
 
         .lock-image-open {
-            width: 200px;
-            height: 300px;
+            width: 100px;
+            height: 150px;
             background-image: url('https://i.postimg.cc/hhfXG4Y0/ei-1734135446051-removebg-preview.png');
             background-size: contain;
             background-repeat: no-repeat;
             margin-bottom: 20px;
             position: absolute;
-            top: -100px;
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 2;
             display: none; /* Inicialmente oculta */
         }
 
-        .dial-container {
-            position: absolute;
-            top: 60%;
-            left: 50%;
-            transform: translateX(-50%);
+        .input-container {
             display: flex;
-            z-index: 1;
+            justify-content: center;
+            margin-top: 20px;
         }
 
-        .dial {
+        .input-field {
             width: 40px;
             height: 60px;
-            background-color: #777;
-            display: inline-block;
-            margin: 0 5px;
             text-align: center;
-            line-height: 60px;
             font-size: 30px;
             font-weight: bold;
+            margin: 0 5px;
+            background-color: #777;
             color: white;
             border-radius: 5px;
             cursor: pointer;
         }
 
-        .message {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 20px;
-            color: #333;
-            opacity: 0;
-            animation: fadeIn 1s forwards;
+        .input-field:focus {
+            outline: none;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
         }
 
         .celebration {
             font-size: 24px;
             color: green;
             font-weight: bold;
+            margin-top: 20px;
             opacity: 0;
             animation: fadeInCelebration 2s forwards;
         }
@@ -101,6 +88,16 @@
         @keyframes fadeInCelebration {
             0% { opacity: 0; }
             100% { opacity: 1; }
+        }
+
+        .welcome-message {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .error {
+            animation: shake 0.5s ease-in-out;
         }
 
         @keyframes shake {
@@ -111,14 +108,21 @@
             100% { transform: translateX(0); }
         }
 
-        .error {
-            animation: shake 0.5s ease-in-out;
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none; /* Inicialmente oculto */
         }
 
-        .welcome-message {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 20px;
+        .button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -132,12 +136,14 @@
     <div class="lock-image"></div> <!-- Imagem do cadeado fechado -->
     <div class="lock-image-open"></div> <!-- Imagem do cadeado aberto, inicialmente oculta -->
     
-    <div class="dial-container">
-        <div class="dial"><span>0</span></div>
-        <div class="dial"><span>0</span></div>
-        <div class="dial"><span>0</span></div>
-        <div class="dial"><span>0</span></div>
+    <div class="input-container">
+        <div class="input-field" id="input1" onclick="inputClick(1)">0</div>
+        <div class="input-field" id="input2" onclick="inputClick(2)">0</div>
+        <div class="input-field" id="input3" onclick="inputClick(3)">0</div>
+        <div class="input-field" id="input4" onclick="inputClick(4)">0</div>
     </div>
+
+    <button class="button" id="confirmButton" onclick="checkPassword()">Confirmar Senha</button>
 
     <div class="message">
         <p>Digite a senha correta para abrir o cadeado!</p>
@@ -152,9 +158,9 @@
 <audio id="errorSound" src="erro.mp3" preload="auto"></audio>
 
 <script>
-    let dials = document.querySelectorAll('.dial');
+    let dials = [document.getElementById('input1'), document.getElementById('input2'), document.getElementById('input3'), document.getElementById('input4')];
     let lockCode = [5, 2, 2, 5]; // A senha será 5225
-    let userCode = [];
+    let userCode = [0, 0, 0, 0];
 
     // Função para vibrar o celular
     function vibrate() {
@@ -163,45 +169,55 @@
         }
     }
 
-    // Adiciona os eventos de clique para os números
-    dials.forEach((dial, index) => {
-        dial.addEventListener('click', () => {
-            let currentDigit = parseInt(dial.innerText);
-            currentDigit = (currentDigit + 1) % 10;  // Incrementa o número, vai de 0 a 9
-            dial.innerText = currentDigit;
+    // Função para lidar com o clique no campo de entrada
+    function inputClick(index) {
+        let currentDigit = userCode[index - 1];
+        currentDigit = (currentDigit + 1) % 10;  // Incrementa o número, vai de 0 a 9
+        userCode[index - 1] = currentDigit;
 
-            // Salva a tentativa do usuário
-            userCode[index] = currentDigit;
+        // Atualiza o valor no campo
+        dials[index - 1].innerText = currentDigit;
 
-            // Verifica se a senha está correta
-            if (userCode.toString() === lockCode.toString()) {
-                document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
-                let celebrationMessage = document.querySelector('.celebration');
-                celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
+        // Habilita o botão de confirmar quando todos os campos forem preenchidos
+        if (userCode.every(num => num !== 0)) {
+            document.getElementById('confirmButton').style.display = 'block';
+        }
+    }
 
-                // Exibe a imagem do cadeado aberto
-                document.querySelector('.lock-image').style.display = 'none'; // Esconde o cadeado fechado
-                document.querySelector('.lock-image-open').style.display = 'block'; // Exibe o cadeado aberto
+    // Função para checar a senha
+    function checkPassword() {
+        if (userCode.toString() === lockCode.toString()) {
+            // Exibe a mensagem de sucesso
+            document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
+            let celebrationMessage = document.querySelector('.celebration');
+            celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
 
-                // Toca o som de sucesso
-                let successSound = document.getElementById('successSound');
-                successSound.play();
+            // Exibe a imagem do cadeado aberto
+            document.querySelector('.lock-image').style.display = 'none'; // Esconde o cadeado fechado
+            document.querySelector('.lock-image-open').style.display = 'block'; // Exibe o cadeado aberto
 
-                // Remove qualquer efeito de erro anterior
-                document.querySelector('.lock-image').classList.remove('error');
-            } else {
-                // Se a senha estiver errada, aplica o efeito de erro
-                document.querySelector('.lock-image').classList.add('error');
+            // Toca o som de sucesso
+            let successSound = document.getElementById('successSound');
+            successSound.play();
+        } else {
+            // Se a senha estiver errada, aplica o efeito de erro
+            document.querySelector('.lock-image').classList.add('error');
 
-                // Toca o som de erro
-                let errorSound = document.getElementById('errorSound');
-                errorSound.play();
+            // Toca o som de erro
+            let errorSound = document.getElementById('errorSound');
+            errorSound.play();
 
-                // Vibra o celular
-                vibrate();
-            }
-        });
-    });
+            // Vibra o celular
+            vibrate();
+
+            // Desabilita o botão de confirmação
+            document.getElementById('confirmButton').style.display = 'none';
+
+            // Reseta os campos
+            userCode = [0, 0, 0, 0];
+            dials.forEach(dial => dial.innerText = '0');
+        }
+    }
 </script>
 
 </body>
