@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadeado com Animações, Som e Erro</title>
+    <title>Cadeado com Senha e Efeitos</title>
     <style>
         body {
             display: flex;
@@ -12,14 +12,13 @@
             height: 100vh;
             margin: 0;
             background-color: #f2f2f2;
+            text-align: center;
         }
 
         .lock-container {
             position: relative;
-            text-align: center;
         }
 
-        /* Atualizei a URL da imagem do cadeado */
         .lock-image {
             width: 200px;
             height: 300px;
@@ -27,7 +26,17 @@
             background-size: contain;
             background-repeat: no-repeat;
             margin-bottom: 20px;
-            transition: transform 0.2s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dial-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            z-index: 2;
         }
 
         .dial {
@@ -76,7 +85,6 @@
             100% { opacity: 1; }
         }
 
-        /* Animação de erro (vibração) */
         @keyframes shake {
             0% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
@@ -89,44 +97,38 @@
             animation: shake 0.5s ease-in-out;
         }
 
-        #confirmButton {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
-        }
-
-        #confirmButton:hover {
-            background-color: #45a049;
+        .welcome-message {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
 
 <div class="lock-container">
+    <div class="welcome-message">
+        <p>Olá, Felipe! Bem-vindo!</p>
+    </div>
+    
     <div class="lock-image"></div> <!-- Imagem do cadeado -->
-    <div>
+    
+    <div class="dial-container">
         <div class="dial"><span>0</span></div>
         <div class="dial"><span>0</span></div>
         <div class="dial"><span>0</span></div>
         <div class="dial"><span>0</span></div>
     </div>
+
     <div class="message">
         <p>Digite a senha correta para abrir o cadeado!</p>
     </div>
+    
     <div class="celebration" style="display: none;">
         <p>Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!</p>
     </div>
-    <div>
-        <button id="confirmButton">Confirmar Senha</button>
-    </div>
 </div>
 
-<!-- Adicionando o efeito sonoro -->
 <audio id="successSound" src="sucesso.mp3" preload="auto"></audio>
 <audio id="errorSound" src="erro.mp3" preload="auto"></audio>
 
@@ -135,9 +137,7 @@
     let lockCode = [5, 2, 2, 5]; // A senha será 5225
     let userCode = [];
 
-    // Exibe as boas-vindas
-    alert('Olá Felipe!');
-
+    // Adiciona os eventos de clique para os números
     dials.forEach((dial, index) => {
         dial.addEventListener('click', () => {
             let currentDigit = parseInt(dial.innerText);
@@ -146,39 +146,28 @@
 
             // Salva a tentativa do usuário
             userCode[index] = currentDigit;
-        });
-    });
 
-    // Confirmação de senha
-    document.getElementById('confirmButton').addEventListener('click', () => {
-        if (userCode.toString() === lockCode.toString()) {
-            // Se a senha estiver correta
-            document.querySelector('.message').innerText = 'Parabéns! Você conseguiu abrir o cadeado! Pegue seu prêmio!';
-            let celebrationMessage = document.querySelector('.celebration');
-            celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
+            // Verifica se a senha está correta
+            if (userCode.toString() === lockCode.toString()) {
+                document.querySelector('.message').innerText = ''; // Remove a mensagem inicial
+                let celebrationMessage = document.querySelector('.celebration');
+                celebrationMessage.style.display = 'block'; // Mostra a mensagem de parabéns
 
-            // Remove o cadeado
-            document.querySelector('.lock-image').style.display = 'none';
+                // Toca o som de sucesso
+                let successSound = document.getElementById('successSound');
+                successSound.play();
 
-            // Toca o som de sucesso
-            let successSound = document.getElementById('successSound');
-            successSound.play();
+                // Remove qualquer efeito de erro anterior
+                document.querySelector('.lock-image').classList.remove('error');
+            } else {
+                // Se a senha estiver errada, aplica o efeito de erro
+                document.querySelector('.lock-image').classList.add('error');
 
-            // Remove a animação de erro, se houver
-            document.querySelector('.lock-image').classList.remove('error');
-        } else {
-            // Se a senha estiver errada
-            document.querySelector('.lock-image').classList.add('error'); // Aplica a animação de erro
-
-            // Toca o som de erro
-            let errorSound = document.getElementById('errorSound');
-            errorSound.play();
-
-            // Faz o celular vibrar (caso o navegador permita)
-            if (navigator.vibrate) {
-                navigator.vibrate([1000, 500, 1000]); // Vibração forte
+                // Toca o som de erro
+                let errorSound = document.getElementById('errorSound');
+                errorSound.play();
             }
-        }
+        });
     });
 </script>
 
