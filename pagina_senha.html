@@ -18,7 +18,7 @@
         }
 
         .welcome {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             font-size: 24px;
             font-weight: bold;
         }
@@ -26,7 +26,7 @@
         .lock-image {
             width: 150px;
             height: auto;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             transition: transform 0.3s;
         }
 
@@ -60,7 +60,6 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            display: none;
         }
 
         .confirm-btn:disabled {
@@ -77,9 +76,9 @@
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
+            25% { transform: translateX(-15px); }
+            50% { transform: translateX(15px); }
+            75% { transform: translateX(-15px); }
         }
 
         .error {
@@ -97,7 +96,7 @@
         <div class="number">0</div>
     </div>
     <button class="confirm-btn" id="confirmBtn" disabled>Confirmar Senha</button>
-    <div class="message" id="successMessage">Parabéns! Você conseguiu abrir o cadeado! Pegue o prêmio!</div>
+    <div class="message" id="successMessage">Parabéns! Você conseguiu, pode abrir a caixa vermelha!</div>
 
     <script>
         const lock = document.getElementById("lock");
@@ -106,33 +105,31 @@
         const successMessage = document.getElementById("successMessage");
 
         const correctPassword = [2, 5, 5, 2];
-        let enteredPassword = [];
+        let enteredPassword = [0, 0, 0, 0];
 
         // Atualiza os números clicados
         numbers.forEach((number, index) => {
             number.addEventListener("click", () => {
                 let currentNumber = parseInt(number.textContent);
-                currentNumber = (currentNumber + 1) % 10;
+                currentNumber = (currentNumber + 1) % 10; // Vai de 0 a 9
                 number.textContent = currentNumber;
                 enteredPassword[index] = currentNumber;
 
-                if (enteredPassword.length === 4) {
-                    confirmBtn.disabled = false;
-                }
+                confirmBtn.disabled = enteredPassword.some(num => num === undefined); // Habilita botão quando todos preenchidos
             });
         });
 
         // Confirma a senha ao clicar
         confirmBtn.addEventListener("click", () => {
-            if (enteredPassword.toString() === correctPassword.toString()) {
-                lock.style.display = "none"; // Cadeado some
+            if (JSON.stringify(enteredPassword) === JSON.stringify(correctPassword)) {
+                lock.style.display = "none"; // Cadeado desaparece
                 successMessage.style.display = "block"; // Mostra mensagem de sucesso
             } else {
                 lock.classList.add("error"); // Animação de erro
-                navigator.vibrate(500); // Vibração no celular
+                navigator.vibrate(1000); // Vibração de 1 segundo
                 setTimeout(() => lock.classList.remove("error"), 500);
             }
         });
     </script>
 </body>
-</html>
+</html>        
